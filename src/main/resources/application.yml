@@ -4,8 +4,8 @@ spring:
 
   datasource:
     url: jdbc:postgresql://localhost:5432/easybank
-    username: smiley
-    password: contra
+    username: postgres
+    password: root
 
   jpa:
     show-sql: true
