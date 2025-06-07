@@ -53,6 +53,7 @@ public class GlobalExceptionHandler {
                 .toList();
         return GenericResponse.builder()
                 .data(errors)
+                .status(HttpStatus.BAD_REQUEST)
                 .build().buildResponse();
     }
 }
