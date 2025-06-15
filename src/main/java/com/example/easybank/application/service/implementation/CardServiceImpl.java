@@ -44,4 +44,9 @@ public class CardServiceImpl implements CardService {
 
         return cardRepository.save(card);
     }
+
+    @Override
+    public Card findMyOwnCard(Long id) throws Exception {
+        return null;
+    }
 }
