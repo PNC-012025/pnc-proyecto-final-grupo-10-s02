@@ -7,7 +7,7 @@ import java.util.UUID;
 
 public interface UserRepository extends GenericRepository<UserData, UUID> {
     public Optional<UserData> findByUsernameOrEmail(String username, String email);
-    public UserData findByEmail(String email);
-    public UserData findByUsername(String username);
-    public UserData findByDui(String dui);
+    public Optional<UserData> findByEmail(String email);
+    public Optional<UserData> findByUsername(String username);
+    public Optional<UserData> findByDui(String dui);
 }

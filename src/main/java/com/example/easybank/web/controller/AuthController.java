@@ -3,16 +3,14 @@ package com.example.easybank.web.controller;
 import com.example.easybank.application.dto.request.LoginDTO;
 import com.example.easybank.application.dto.request.RegisterDTO;
 import com.example.easybank.application.dto.response.TokenResponse;
+import com.example.easybank.application.dto.response.UserResponseDTO;
 import com.example.easybank.application.service.implementation.AuthServiceImpl;
 import com.example.easybank.util.GenericResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import static com.example.easybank.util.Constant.*;
 
@@ -38,6 +36,16 @@ public class AuthController {
                 .status(HttpStatus.OK)
                 .data(tokenResponse)
                 .message("User login correctly")
+                .build().buildResponse();
+    }
+
+    @GetMapping(WHO_AM_I)
+    public ResponseEntity<GenericResponse> whoAmI() throws Exception {
+        UserResponseDTO userData = authService.whoami();
+        return GenericResponse.builder()
+                .status(HttpStatus.OK)
+                .data(userData)
+                .message("WhoAmI correctly")
                 .build().buildResponse();
     }
 }

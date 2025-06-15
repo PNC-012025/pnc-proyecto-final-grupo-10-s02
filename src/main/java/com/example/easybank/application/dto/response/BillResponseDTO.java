@@ -5,17 +5,17 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.UUID;
+import java.math.BigDecimal;
+import java.util.Date;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UserResponseDTO {
-    private UUID id;
-    private String username;
+public class BillResponseDTO {
     private String name;
-    private String email;
-    private String dui;
-    private Boolean active;
+    private String category;
+    private BigDecimal amount;
+    private Date date;
+    private String state;
 }

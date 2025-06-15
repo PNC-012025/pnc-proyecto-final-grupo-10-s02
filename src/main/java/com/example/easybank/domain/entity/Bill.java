@@ -7,8 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Date;
 import java.util.UUID;
 
 @Data
@@ -16,30 +15,27 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 @Entity
-public class Account {
+public class Bill {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column
-    private String number;
+    private String name;
 
     @Column
-    private String type;
+    private String category;
 
     @Column
-    private BigDecimal balance;
+    private BigDecimal amount;
 
     @Column
-    private String currency;
+    private Date date;
 
     @Column
-    private LocalDateTime createdAt;
-
-    @OneToMany(mappedBy = "originAccount", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<Transaction> transactions;
+    private String state;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "fk_user_account"))
+    @JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "fk_user_bill"))
     private UserData user;
 }
