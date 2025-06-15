@@ -15,6 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +32,7 @@ public class BillServiceImpl implements BillService {
 
         Bill bill = BillMapper.toEntity(billRequestDTO);
         bill.setUser(user);
+        bill.setState("PENDING");
 
         billRepository.save(bill);
     }
@@ -46,5 +48,20 @@ public class BillServiceImpl implements BillService {
                 .stream()
                 .map(BillMapper::toDTO)
                 .toList();
+    }
+
+    @Override
+    public void delete(UUID id) throws Exception {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        Bill bill = billRepository.findById(id)
+                .orElseThrow(() -> new ModelNotFoundException("Bill not found"));
+
+        // TODO CREAR EXCEPCION PARA ESTO
+        if (!bill.getUser().getUsername().equals(username)) {
+            throw new ModelNotFoundException("User not logged in");
+        }
+
+        billRepository.delete(bill);
     }
 }

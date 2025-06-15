@@ -8,6 +8,7 @@ import com.example.easybank.domain.entity.Bill;
 import com.example.easybank.util.GenericResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -41,6 +42,14 @@ public class BillController {
                 .status(HttpStatus.OK)
                 .message("Bills found")
                 .data(bills)
+                .build().buildResponse();
+    }
+
+    @DeleteMapping(DELETE + "/{id}")
+    public ResponseEntity<GenericResponse> deleteBill(@PathVariable("id") BillRequestDTO bill) throws Exception {
+        return GenericResponse.builder()
+                .status(HttpStatus.NO_CONTENT)
+                .message("Successfully deleted bill")
                 .build().buildResponse();
     }
 }
