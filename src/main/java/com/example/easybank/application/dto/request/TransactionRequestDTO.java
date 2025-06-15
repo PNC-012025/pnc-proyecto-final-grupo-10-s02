@@ -18,5 +18,4 @@ public class TransactionRequestDTO {
     private String currency;
     private String description;
     private String destinationAccountNumber;
-    private LocalDateTime transactionDate;
 }

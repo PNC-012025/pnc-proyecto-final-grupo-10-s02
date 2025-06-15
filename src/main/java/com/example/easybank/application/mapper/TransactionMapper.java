@@ -8,7 +8,7 @@ public class TransactionMapper {
         return Transaction.builder()
                 .type(transactionRequestDTO.getType())
                 .description(transactionRequestDTO.getDescription())
-                .dateTime(transactionRequestDTO.getTransactionDate())
+                .amount(transactionRequestDTO.getAmount())
                 .build();
     }
 }

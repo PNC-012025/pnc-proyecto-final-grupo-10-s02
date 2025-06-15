@@ -13,9 +13,8 @@ import java.util.Date;
 @NoArgsConstructor
 @Builder
 public class BillRequestDTO {
-    private String name;
+    private String expenseName;
     private String category;
     private BigDecimal amount;
     private Date date;
-    private String state;
 }
