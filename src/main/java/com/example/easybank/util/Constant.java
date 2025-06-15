@@ -10,6 +10,7 @@ public class Constant {
     public static final String AUTH = "/auth";
     public static final String BILL = "/bill";
     public static final String CARD = "/card";
+    public static final String ACCOUNT = "/account";
 
     // * Method Routed
     public static final String REGISTER = "/register";

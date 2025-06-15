@@ -47,6 +47,11 @@ public class CardServiceImpl implements CardService {
 
     @Override
     public Card findMyOwnCard() throws Exception {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        UserData user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ModelNotFoundException("User not found"));
+
+        Card card = user.getCards().getFirst();
 
         return null;
     }
