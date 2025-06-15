@@ -13,7 +13,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Builder
 public class BillResponseDTO {
-    private String name;
+    private String expenseName;
     private String category;
     private BigDecimal amount;
     private Date date;
