@@ -46,7 +46,8 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
-    public Card findMyOwnCard(Long id) throws Exception {
+    public Card findMyOwnCard() throws Exception {
+
         return null;
     }
 }
