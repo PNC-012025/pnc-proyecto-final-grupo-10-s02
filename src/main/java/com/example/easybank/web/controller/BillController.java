@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 import static com.example.easybank.util.Constant.*;
 
@@ -46,9 +47,10 @@ public class BillController {
     }
 
     @DeleteMapping(DELETE + "/{id}")
-    public ResponseEntity<GenericResponse> deleteBill(@PathVariable("id") BillRequestDTO bill) throws Exception {
+    public ResponseEntity<GenericResponse> deleteBill(@PathVariable("id") UUID id) throws Exception {
+        billService.delete(id);
         return GenericResponse.builder()
-                .status(HttpStatus.NO_CONTENT)
+                .status(HttpStatus.ACCEPTED)
                 .message("Successfully deleted bill")
                 .build().buildResponse();
     }
