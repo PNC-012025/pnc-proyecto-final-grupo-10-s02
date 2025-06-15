@@ -43,6 +43,11 @@ public class AccountServiceImpl implements AccountService {
         UserData user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ModelNotFoundException("User not found"));
 
+        // TODO: Hacer excepcion para este if
+        if (user.getCards().isEmpty()) {
+            throw new ModelNotFoundException("Cards not found");
+        }
+
         Account account = user.getAccounts().getFirst();
 
         return AccountResponseDTO.builder()
