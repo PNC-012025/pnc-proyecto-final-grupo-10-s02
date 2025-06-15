@@ -14,34 +14,23 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class RegisterDTO {
-    @NotEmpty
-    @NotNull
-    @NotBlank
+    @NotBlank(message = "DUI is necessary")
     private String dui;
 
-    @NotEmpty
-    @NotNull
-    @NotBlank
+    @NotBlank(message = "Username is necessary")
     private String username;
 
-    @NotEmpty
-    @NotNull
-    @NotBlank
+    @NotBlank(message = "First Name is necessary")
     private String firstName;
 
-    @NotEmpty
-    @NotNull
-    @NotBlank
+    @NotBlank(message = "Last Name is necessary")
     private String lastName;
 
-    @NotEmpty
-    @NotNull
-    @NotBlank
-    @Email(message = "")
+
+    @NotBlank(message = "Email is necessary")
+    @Email(message = "Invalid email format")
     private String email;
 
-    @NotEmpty
-    @NotNull
-    @NotBlank
+    @NotBlank(message = "Password is necessary")
     private String password;
 }
