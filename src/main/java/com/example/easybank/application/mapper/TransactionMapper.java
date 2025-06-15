@@ -6,7 +6,6 @@ import com.example.easybank.domain.entity.Transaction;
 public class TransactionMapper {
     public static Transaction toEntity(TransactionRequestDTO transactionRequestDTO) {
         return Transaction.builder()
-                .type(transactionRequestDTO.getType())
                 .description(transactionRequestDTO.getDescription())
                 .amount(transactionRequestDTO.getAmount())
                 .build();
