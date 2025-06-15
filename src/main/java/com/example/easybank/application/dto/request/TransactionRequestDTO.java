@@ -13,9 +13,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 public class TransactionRequestDTO {
+    private String firstName;
+    private String lastName;
     private BigDecimal amount;
-    private String type;
-    private String currency;
     private String description;
-    private String destinationAccountNumber;
+    private String accountNumber;
 }

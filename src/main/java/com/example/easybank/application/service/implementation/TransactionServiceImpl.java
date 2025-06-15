@@ -6,8 +6,7 @@ import com.example.easybank.application.service.TransactionService;
 import com.example.easybank.domain.entity.Account;
 import com.example.easybank.domain.entity.Transaction;
 import com.example.easybank.domain.entity.UserData;
-import com.example.easybank.domain.exception.InvalidAmountException;
-import com.example.easybank.domain.exception.ModelNotFoundException;
+import com.example.easybank.domain.exception.*;
 import com.example.easybank.infrastructure.repository.AccountRepository;
 import com.example.easybank.infrastructure.repository.TransactionRepository;
 import com.example.easybank.infrastructure.repository.UserRepository;
@@ -28,26 +27,33 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public void createTransaction(TransactionRequestDTO transactionRequestDTO) throws Exception {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-
+        System.out.println(transactionRequestDTO);
         UserData user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ModelNotFoundException("User not found"));
 
         Account originAccount = accountRepository.findByNumber(user.getAccounts().getFirst().getNumber())
                 .orElseThrow(() -> new ModelNotFoundException("Origin account not found"));
 
-        Account destinationAccount = accountRepository.findByNumber(transactionRequestDTO.getDestinationAccountNumber())
+        Account destinationAccount = accountRepository.findByNumber(transactionRequestDTO.getAccountNumber())
                 .orElseThrow(() -> new ModelNotFoundException("Destination account not found"));
 
-        // TODO: Change this exception
         if (originAccount.getNumber().equals(destinationAccount.getNumber())) {
-            throw new InvalidAmountException("Cannot be transferred to the same account");
+            throw new InvalidTransferException("Cannot transfer to the same account");
+        }
+
+        if (!destinationAccount.getUser().getFirstName().toLowerCase().equals(transactionRequestDTO.getFirstName())) {
+            throw new RecipientNameMismatchException("Some recipients do not match");
+        }
+
+        if (!destinationAccount.getUser().getLastName().toLowerCase().equals(transactionRequestDTO.getLastName())) {
+            throw new RecipientNameMismatchException("Some recipients do not match Last name");
         }
 
         BigDecimal amount = transactionRequestDTO.getAmount();
         BigDecimal originBalance = originAccount.getBalance();
 
         if (originBalance.compareTo(amount) < 0) {
-            throw new InvalidAmountException("Insufficient balance in the source account");
+            throw new InsufficientFundsException("Insufficient balance in the source account");
         }
 
         originAccount.setBalance(originBalance.subtract(amount));
@@ -62,6 +68,4 @@ public class TransactionServiceImpl implements TransactionService {
         accountRepository.save(destinationAccount);
         transactionRepository.save(transaction);
     }
-
-    
 }

@@ -63,6 +63,91 @@ public class GlobalExceptionHandler {
                 .build().buildResponse();
     }
 
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<GenericResponse> handleAccessDenied(
+            AccessDeniedException ex,
+            WebRequest request
+    ) {
+        CustomErrorResponse errorResponse = new CustomErrorResponse(
+                LocalDate.now(),
+                ex.getMessage(),
+                request.getDescription(false)
+        );
+        return GenericResponse.builder()
+                .data(errorResponse)
+                .status(HttpStatus.FORBIDDEN)
+                .build().buildResponse();
+    }
+
+    @ExceptionHandler(BillAlreadyPaidException.class)
+    public ResponseEntity<GenericResponse> handleBillAlreadyPaid(
+            BillAlreadyPaidException ex,
+            WebRequest request
+    ) {
+        CustomErrorResponse errorResponse = new CustomErrorResponse(
+                LocalDate.now(),
+                ex.getMessage(),
+                request.getDescription(false)
+        );
+
+        return GenericResponse.builder()
+                .data(errorResponse)
+                .status(HttpStatus.CONFLICT)
+                .build().buildResponse();
+    }
+
+    @ExceptionHandler(InsufficientFundsException.class)
+    public ResponseEntity<GenericResponse> handleInsufficientFunds(
+            InsufficientFundsException ex,
+            WebRequest request
+    ) {
+        CustomErrorResponse errorResponse = new CustomErrorResponse(
+                LocalDate.now(),
+                ex.getMessage(),
+                request.getDescription(false)
+        );
+
+        return GenericResponse.builder()
+                .data(errorResponse)
+                .status(HttpStatus.BAD_REQUEST)
+                .build().buildResponse();
+    }
+
+    @ExceptionHandler(InvalidTransferException.class)
+    public ResponseEntity<GenericResponse> handleInvalidTransfer(
+            InvalidTransferException ex,
+            WebRequest request
+    ) {
+        CustomErrorResponse errorResponse = new CustomErrorResponse(
+                LocalDate.now(),
+                ex.getMessage(),
+                request.getDescription(false)
+        );
+
+        return GenericResponse.builder()
+                .data(errorResponse)
+                .status(HttpStatus.BAD_REQUEST)
+                .build().buildResponse();
+    }
+
+    @ExceptionHandler(RecipientNameMismatchException.class)
+    public ResponseEntity<GenericResponse> handleRecipientNameMismatch(
+            RecipientNameMismatchException ex,
+            WebRequest request
+    ) {
+        CustomErrorResponse errorResponse = new CustomErrorResponse(
+                LocalDate.now(),
+                ex.getMessage(),
+                request.getDescription(false)
+        );
+
+        return GenericResponse.builder()
+                .data(errorResponse)
+                .status(HttpStatus.BAD_REQUEST)
+                .build().buildResponse();
+    }
+
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<GenericResponse> handleValueOfEntity(MethodArgumentNotValidException e) {
         List<String> errors = e.getFieldErrors().stream()

@@ -11,4 +11,5 @@ public interface BillService {
     public void save(BillRequestDTO billRequestDTO) throws Exception;
     public List<BillResponseDTO> getAllMyBills() throws Exception;
     public void delete(UUID id) throws Exception;
+    public void payBill(UUID id) throws Exception;
 }
