@@ -16,6 +16,7 @@ public class BillMapper {
 
     public static BillResponseDTO toDTO(Bill bill) {
         return BillResponseDTO.builder()
+                .id(bill.getId())
                 .expenseName(bill.getName())
                 .category(bill.getCategory())
                 .amount(bill.getAmount())
