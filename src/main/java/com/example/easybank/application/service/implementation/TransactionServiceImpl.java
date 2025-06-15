@@ -16,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -55,6 +56,7 @@ public class TransactionServiceImpl implements TransactionService {
         Transaction transaction = TransactionMapper.toEntity(transactionRequestDTO);
         transaction.setOriginAccount(originAccount);
         transaction.setDestinationAccount(destinationAccount);
+        transaction.setDateTime(LocalDateTime.now());
 
         accountRepository.save(originAccount);
         accountRepository.save(destinationAccount);
