@@ -84,8 +84,11 @@ public class AuthServiceImpl implements AuthService {
     public UserResponseDTO whoami() throws Exception {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        return userRepository.findByUsername(username)
-                .map(UserMapper::toDTO)
+        UserData user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ModelNotFoundException("User not found"));
+
+        user.setActive(!user.getCards().isEmpty());
+
+        return UserMapper.toDTO(user);
     }
 }
