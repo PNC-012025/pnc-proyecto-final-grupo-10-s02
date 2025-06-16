@@ -46,6 +46,15 @@ public class BillController {
                 .build().buildResponse();
     }
 
+    @PatchMapping(PAY + "/{id}")
+    public ResponseEntity<GenericResponse> payBill(@PathVariable("id") UUID id) throws Exception {
+        billService.payBill(id);
+        return GenericResponse.builder()
+                .status(HttpStatus.OK)
+                .message("Successfully payed bill")
+                .build().buildResponse();
+    }
+
     @DeleteMapping(DELETE + "/{id}")
     public ResponseEntity<GenericResponse> deleteBill(@PathVariable("id") UUID id) throws Exception {
         billService.delete(id);
