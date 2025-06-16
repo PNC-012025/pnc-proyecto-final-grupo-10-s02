@@ -1,0 +1,21 @@
+package com.example.easybank.application.dto.response;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class TransactionResponseDTO {
+    private BigDecimal amount;
+    private String description;
+    private String accountNumber;
+    private LocalDateTime date;
+    private String type;
+}

@@ -37,7 +37,10 @@ public class Account {
     private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "originAccount", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<Transaction> transactions;
+    private List<Transaction> originTransactions;
+
+    @OneToMany(mappedBy = "destinationAccount", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Transaction> destinationTransactions;
 
     @ManyToOne
     @JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "fk_user_account"))

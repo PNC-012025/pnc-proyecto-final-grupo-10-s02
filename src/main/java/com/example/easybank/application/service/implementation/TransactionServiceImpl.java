@@ -1,6 +1,7 @@
 package com.example.easybank.application.service.implementation;
 
 import com.example.easybank.application.dto.request.TransactionRequestDTO;
+import com.example.easybank.application.dto.response.TransactionResponseDTO;
 import com.example.easybank.application.mapper.TransactionMapper;
 import com.example.easybank.application.service.TransactionService;
 import com.example.easybank.domain.entity.Account;
@@ -10,12 +11,15 @@ import com.example.easybank.domain.exception.*;
 import com.example.easybank.infrastructure.repository.AccountRepository;
 import com.example.easybank.infrastructure.repository.TransactionRepository;
 import com.example.easybank.infrastructure.repository.UserRepository;
+import com.example.easybank.util.generator.RandomCreditCardGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +27,7 @@ public class TransactionServiceImpl implements TransactionService {
     private final TransactionRepository transactionRepository;
     private final UserRepository userRepository;
     private final AccountRepository accountRepository;
+    private final RandomCreditCardGenerator randomCreditCardGenerator;
 
     @Override
     public void createTransaction(TransactionRequestDTO transactionRequestDTO) throws Exception {
@@ -67,5 +72,36 @@ public class TransactionServiceImpl implements TransactionService {
         accountRepository.save(originAccount);
         accountRepository.save(destinationAccount);
         transactionRepository.save(transaction);
+    }
+
+    @Override
+    public List<TransactionResponseDTO> findMyOwnTransactions() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        UserData user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ModelNotFoundException("User not found"));
+
+        Account account = user.getAccounts().getFirst();
+
+        List<TransactionResponseDTO> transactionResponseOriginDTOS = account
+                .getOriginTransactions().stream().map(transaction -> TransactionResponseDTO.builder()
+                        .accountNumber(account.getNumber())
+                        .amount(transaction.getAmount())
+                        .date(transaction.getDateTime())
+                        .type("SENDER")
+                        .build()).toList();
+
+        List<TransactionResponseDTO> transactionResponseDestinationDTOS = account
+                .getDestinationTransactions().stream().map(transaction -> TransactionResponseDTO.builder()
+                        .accountNumber(account.getNumber())
+                        .amount(transaction.getAmount())
+                        .date(transaction.getDateTime())
+                        .type("RECEIVER")
+                        .build()).toList();
+
+        List<TransactionResponseDTO> finalResponse = new ArrayList<>();
+        finalResponse.addAll(transactionResponseOriginDTOS);
+        finalResponse.addAll(transactionResponseDestinationDTOS);
+
+        return finalResponse;
     }
 }
