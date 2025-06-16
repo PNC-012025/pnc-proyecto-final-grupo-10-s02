@@ -84,6 +84,7 @@ public class TransactionServiceImpl implements TransactionService {
 
         List<TransactionResponseDTO> transactionResponseOriginDTOS = account
                 .getOriginTransactions().stream().map(transaction -> TransactionResponseDTO.builder()
+                        .id(transaction.getId())
                         .accountNumber(account.getNumber())
                         .amount(transaction.getAmount())
                         .date(transaction.getDateTime())
@@ -92,6 +93,7 @@ public class TransactionServiceImpl implements TransactionService {
 
         List<TransactionResponseDTO> transactionResponseDestinationDTOS = account
                 .getDestinationTransactions().stream().map(transaction -> TransactionResponseDTO.builder()
+                        .id(transaction.getId())
                         .accountNumber(account.getNumber())
                         .amount(transaction.getAmount())
                         .date(transaction.getDateTime())
