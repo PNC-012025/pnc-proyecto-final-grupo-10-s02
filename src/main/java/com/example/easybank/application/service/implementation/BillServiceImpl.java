@@ -10,6 +10,7 @@ import com.example.easybank.domain.entity.Bill;
 import com.example.easybank.domain.entity.UserData;
 import com.example.easybank.domain.exception.AccessDeniedException;
 import com.example.easybank.domain.exception.BillAlreadyPaidException;
+import com.example.easybank.domain.exception.InsufficientFundsException;
 import com.example.easybank.domain.exception.ModelNotFoundException;
 import com.example.easybank.infrastructure.repository.AccountRepository;
 import com.example.easybank.infrastructure.repository.BillRepository;
@@ -18,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -76,6 +78,15 @@ public class BillServiceImpl implements BillService {
         Bill bill = billRepository.findById(id)
                 .orElseThrow(() -> new ModelNotFoundException("Bill not found"));
 
+        Account account = bill.getUser().getAccounts().getFirst();
+
+        BigDecimal billAmount = bill.getAmount();
+        BigDecimal accountBalance = account.getBalance();
+
+        if (billAmount.compareTo(accountBalance) > 0) {
+            throw new InsufficientFundsException("You don't have enough money");
+        }
+
         if (!bill.getUser().getUsername().equals(username)) {
             throw new AccessDeniedException("User is not the owner of this bill");
         }
@@ -83,8 +94,6 @@ public class BillServiceImpl implements BillService {
         if (bill.getState().equals("PAID")) {
             throw new BillAlreadyPaidException("Bill is already paid");
         }
-
-        Account account = bill.getUser().getAccounts().getFirst();
         account.setBalance(account.getBalance().subtract(bill.getAmount()));
         bill.setState("PAID");
 
