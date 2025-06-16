@@ -8,10 +8,7 @@ import com.example.easybank.application.service.BillService;
 import com.example.easybank.domain.entity.Account;
 import com.example.easybank.domain.entity.Bill;
 import com.example.easybank.domain.entity.UserData;
-import com.example.easybank.domain.exception.AccessDeniedException;
-import com.example.easybank.domain.exception.BillAlreadyPaidException;
-import com.example.easybank.domain.exception.InsufficientFundsException;
-import com.example.easybank.domain.exception.ModelNotFoundException;
+import com.example.easybank.domain.exception.*;
 import com.example.easybank.infrastructure.repository.AccountRepository;
 import com.example.easybank.infrastructure.repository.BillRepository;
 import com.example.easybank.infrastructure.repository.UserRepository;
@@ -36,6 +33,16 @@ public class BillServiceImpl implements BillService {
 
         UserData user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ModelNotFoundException("User not found"));
+
+        if (billRequestDTO.getId() != null) {
+            if (!billRequestDTO.getId().equals(user.getId())) {
+                throw new AccessDeniedException("Insufficient funds");
+            }
+        }
+
+        if (billRequestDTO.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new InvalidAmountException("Amount must be greater than zero");
+        }
 
         Bill bill = BillMapper.toEntity(billRequestDTO);
         bill.setUser(user);
