@@ -88,6 +88,7 @@ public class TransactionServiceImpl implements TransactionService {
                         .accountNumber(account.getNumber())
                         .amount(transaction.getAmount())
                         .date(transaction.getDateTime())
+                        .description(transaction.getDescription())
                         .type("SENDER")
                         .build()).toList();
 
@@ -96,6 +97,7 @@ public class TransactionServiceImpl implements TransactionService {
                         .id(transaction.getId())
                         .accountNumber(account.getNumber())
                         .amount(transaction.getAmount())
+                        .description(transaction.getDescription())
                         .date(transaction.getDateTime())
                         .type("RECEIVER")
                         .build()).toList();
