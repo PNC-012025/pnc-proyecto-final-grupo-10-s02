@@ -89,7 +89,6 @@ public class GlobalExceptionHandler {
                 ex.getMessage(),
                 request.getDescription(false)
         );
-
         return GenericResponse.builder()
                 .data(errorResponse)
                 .status(HttpStatus.CONFLICT)
@@ -106,7 +105,6 @@ public class GlobalExceptionHandler {
                 ex.getMessage(),
                 request.getDescription(false)
         );
-
         return GenericResponse.builder()
                 .data(errorResponse)
                 .status(HttpStatus.BAD_REQUEST)
@@ -123,7 +121,6 @@ public class GlobalExceptionHandler {
                 ex.getMessage(),
                 request.getDescription(false)
         );
-
         return GenericResponse.builder()
                 .data(errorResponse)
                 .status(HttpStatus.BAD_REQUEST)
@@ -140,7 +137,6 @@ public class GlobalExceptionHandler {
                 ex.getMessage(),
                 request.getDescription(false)
         );
-
         return GenericResponse.builder()
                 .data(errorResponse)
                 .status(HttpStatus.BAD_REQUEST)
