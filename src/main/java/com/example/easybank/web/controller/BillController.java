@@ -55,6 +55,15 @@ public class BillController {
                 .build().buildResponse();
     }
 
+    @PatchMapping(EDIT)
+    public ResponseEntity<GenericResponse> editBill(@RequestBody @Valid BillRequestDTO bill) throws Exception {
+        billService.save(bill);
+        return GenericResponse.builder()
+                .status(HttpStatus.OK)
+                .message("Successfully edited bill")
+                .build().buildResponse();
+    }
+
     @DeleteMapping(DELETE + "/{id}")
     public ResponseEntity<GenericResponse> deleteBill(@PathVariable("id") UUID id) throws Exception {
         billService.delete(id);

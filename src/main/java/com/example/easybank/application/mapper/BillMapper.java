@@ -7,6 +7,7 @@ import com.example.easybank.domain.entity.Bill;
 public class BillMapper {
     public static Bill toEntity(BillRequestDTO billRequestDTO) {
         return Bill.builder()
+                .id(billRequestDTO.getId())
                 .name(billRequestDTO.getExpenseName())
                 .category(billRequestDTO.getCategory())
                 .amount(billRequestDTO.getAmount())
