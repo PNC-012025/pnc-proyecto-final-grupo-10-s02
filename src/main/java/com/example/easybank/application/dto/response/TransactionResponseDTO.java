@@ -20,4 +20,5 @@ public class TransactionResponseDTO {
     private String accountNumber;
     private LocalDateTime date;
     private String type;
+    private String name;
 }
