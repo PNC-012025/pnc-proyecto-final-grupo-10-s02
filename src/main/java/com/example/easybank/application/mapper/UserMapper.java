@@ -2,8 +2,12 @@ package com.example.easybank.application.mapper;
 
 import com.example.easybank.application.dto.request.RegisterDTO;
 import com.example.easybank.application.dto.response.UserResponseDTO;
+import com.example.easybank.domain.entity.Role;
 import com.example.easybank.domain.entity.UserData;
 import com.example.easybank.util.PasswordUtil;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class UserMapper {
     public static UserData toEntity(RegisterDTO registerDTO) {
@@ -25,7 +29,13 @@ public class UserMapper {
                 .username(userData.getUsername())
                 .name(userData.getFirstName() + " " + userData.getLastName())
                 .email(userData.getEmail())
+                .roles(userData.getRoles()
+                        .stream()
+                        .map(Role::getName)
+                        .collect(Collectors.toList()))
                 .active(userData.getActive())
                 .build();
     }
+
+
 }

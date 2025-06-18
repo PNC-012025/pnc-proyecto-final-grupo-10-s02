@@ -31,6 +31,8 @@ public class GlobalExceptionHandler {
                 .build().buildResponse();
     }
 
+
+
     @ExceptionHandler(AlreadyExistsException.class)
     public ResponseEntity<GenericResponse> handleEntityAlreadyExists(
             AlreadyExistsException ex,
@@ -142,6 +144,7 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.BAD_REQUEST)
                 .build().buildResponse();
     }
+
 
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
