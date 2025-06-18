@@ -37,5 +37,12 @@ public class UserMapper {
                 .build();
     }
 
+    public static List<UserResponseDTO> toDTOList(List<UserData> userData) {
+        return userData.stream()
+                .map(UserMapper::toDTO)
+                .toList();
+    }
+
+
 
 }
