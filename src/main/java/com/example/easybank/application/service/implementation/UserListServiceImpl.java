@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -17,7 +18,12 @@ public class UserListServiceImpl implements UserListService {
 
 
     @Override
-    public List<UserResponseDTO> findAllUsers() {
+    public List<UserResponseDTO> findAllUsers() throws Exception {
         return UserMapper.toDTOList(userRepository.findAll());
+    }
+
+    @Override
+    public void delete(UUID id) throws Exception {
+        userRepository.deleteById(id);
     }
 }
