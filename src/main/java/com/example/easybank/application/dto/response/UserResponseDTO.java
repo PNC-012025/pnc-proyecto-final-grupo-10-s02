@@ -1,10 +1,12 @@
 package com.example.easybank.application.dto.response;
 
+import com.example.easybank.domain.entity.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -18,4 +20,5 @@ public class UserResponseDTO {
     private String email;
     private String dui;
     private Boolean active;
+    private List<String> roles;
 }
