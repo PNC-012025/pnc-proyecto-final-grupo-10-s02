@@ -27,5 +27,6 @@ public class Constant {
 
     public static final String ADMIN = "/admin";
     public static final String USER_LIST = "/userlist";
+    public static final String CHANGE_ROLE = "/changerole";
 
 }

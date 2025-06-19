@@ -1,6 +1,7 @@
 package com.example.easybank.web.controller;
 
 
+import com.example.easybank.application.dto.request.ChangeRoleRequestDTO;
 import com.example.easybank.application.dto.response.UserResponseDTO;
 import com.example.easybank.application.service.UserListService;
 import com.example.easybank.util.GenericResponse;
@@ -42,6 +43,19 @@ public class UserListController {
                 .message("Successfully deleted user")
                 .build().buildResponse();
     }
+
+
+    @PutMapping(USER_LIST + CHANGE_ROLE + "/{id}")
+    public ResponseEntity<GenericResponse> changeUserRoles(@PathVariable ("id") UUID id, @RequestBody ChangeRoleRequestDTO request) {
+
+        userListService.changeRoles(id, request.getRoles());
+
+        return GenericResponse.builder()
+                .status(HttpStatus.OK)
+                .message("Roles updated successfully")
+                .build().buildResponse();
+    }
+
 
 
 
