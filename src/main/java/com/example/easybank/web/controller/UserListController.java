@@ -34,6 +34,16 @@ public class UserListController {
 
     }
 
+    @DeleteMapping(USER_LIST + DELETE + "/{id}")
+    public ResponseEntity<GenericResponse> deleteUser(@PathVariable("id") UUID id) throws Exception {
+        userListService.delete(id);
+        return GenericResponse.builder()
+                .status(HttpStatus.ACCEPTED)
+                .message("Successfully deleted user")
+                .build().buildResponse();
+    }
+
+
 
 }
 
