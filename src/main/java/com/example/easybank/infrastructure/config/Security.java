@@ -52,6 +52,7 @@ public class Security {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests((authorizeRequests) -> {
                     authorizeRequests
+                            .requestMatchers(API + ADMIN + "/**").hasRole("ADMIN")
                             .requestMatchers(API + AUTH + LOGIN).permitAll()
                             .requestMatchers(API + AUTH + REGISTER).permitAll()
                             .anyRequest().authenticated();

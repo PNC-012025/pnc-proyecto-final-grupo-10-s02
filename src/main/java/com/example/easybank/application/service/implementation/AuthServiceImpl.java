@@ -61,7 +61,7 @@ public class AuthServiceImpl implements AuthService {
 
         UserData user = UserMapper.toEntity(registerDTO);
 
-        List<Role> roles = roleRepository.findByName("USER");
+        List<Role> roles = roleRepository.findByName("ROLE_USER");
         user.setRoles(new HashSet<>(roles));
         UserData userSaved = userRepository.save(user);
 

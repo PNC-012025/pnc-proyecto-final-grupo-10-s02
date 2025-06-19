@@ -4,6 +4,9 @@ package com.example.easybank.application.service.implementation;
 import com.example.easybank.application.dto.response.UserResponseDTO;
 import com.example.easybank.application.mapper.UserMapper;
 import com.example.easybank.application.service.UserListService;
+import com.example.easybank.domain.entity.Bill;
+import com.example.easybank.domain.entity.UserData;
+import com.example.easybank.domain.exception.ModelNotFoundException;
 import com.example.easybank.infrastructure.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,6 +27,7 @@ public class UserListServiceImpl implements UserListService {
 
     @Override
     public void delete(UUID id) throws Exception {
+
         userRepository.deleteById(id);
     }
 }
