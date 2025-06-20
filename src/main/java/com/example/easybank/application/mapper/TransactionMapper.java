@@ -13,30 +13,43 @@ public class TransactionMapper {
     }
 
     public static TransactionResponseDTO toDTO(Transaction transaction) {
-        if(transaction.getType().equals("RECEIVER")){
-            return TransactionResponseDTO.builder()
-                    .id(transaction.getId())
-                    .name(transaction.getOriginAccount().getUser().getFirstName() + " " + transaction.getOriginAccount().getUser().getLastName())
-                    .accountNumber(transaction.getOriginAccount().getNumber())
-                    .amount(transaction.getAmount())
-                    .date(transaction.getDateTime())
-                    .description(transaction.getDescription())
-                    .type(transaction.getType())
-                    .build();
+
+        String type = transaction.getType() != null ? transaction.getType() : "UNKNOWN";
+
+        String name;
+        String accountNumber;
+
+        if ("RECEIVER".equals(type)) {
+
+            if (transaction.getOriginAccount() != null && transaction.getOriginAccount().getUser() != null) {
+                name = transaction.getOriginAccount().getUser().getFirstName() + " " + transaction.getOriginAccount().getUser().getLastName();
+                accountNumber = transaction.getOriginAccount().getNumber();
+            } else {
+                name = "Bank";
+                accountNumber = "Unknown";
+            }
+
+        } else {
+
+            if (transaction.getDestinationAccount() != null && transaction.getDestinationAccount().getUser() != null) {
+                name = transaction.getDestinationAccount().getUser().getFirstName() + " " + transaction.getDestinationAccount().getUser().getLastName();
+                accountNumber = transaction.getDestinationAccount().getNumber();
+            } else {
+                name = "Bank";
+                accountNumber = "Unknown";
+            }
         }
 
-        else{
-            return TransactionResponseDTO.builder()
-                    .id(transaction.getId())
-                    .name(transaction.getDestinationAccount().getUser().getFirstName() + " " + transaction.getDestinationAccount().getUser().getLastName())
-                    .accountNumber(transaction.getDestinationAccount().getNumber())
-                    .amount(transaction.getAmount())
-                    .date(transaction.getDateTime())
-                    .description(transaction.getDescription())
-                    .type(transaction.getType())
-                    .build();
-
-        }
-
+        return TransactionResponseDTO.builder()
+                .id(transaction.getId())
+                .name(name)
+                .accountNumber(accountNumber)
+                .amount(transaction.getAmount())
+                .date(transaction.getDateTime())
+                .description(transaction.getDescription())
+                .type(type)
+                .build();
     }
+
 }
+

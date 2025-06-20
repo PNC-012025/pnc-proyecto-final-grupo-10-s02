@@ -68,6 +68,7 @@ public class TransactionServiceImpl implements TransactionService {
         transaction.setOriginAccount(originAccount);
         transaction.setDestinationAccount(destinationAccount);
         transaction.setDateTime(LocalDateTime.now());
+        transaction.setType("TRANSFER");
 
         accountRepository.save(originAccount);
         accountRepository.save(destinationAccount);
