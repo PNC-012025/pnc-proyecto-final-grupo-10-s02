@@ -55,4 +55,19 @@ public class UserListServiceImpl implements UserListService {
 
     }
 
+    @Transactional//(readOnly = true)
+    public UserResponseDTO getUserById(UUID id) {
+        UserData user = userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + id));
+
+        UserResponseDTO dto = UserMapper.toDTO(user);
+        dto.setRoles(user.getRoles().stream()
+                .map(Role::getName)
+                .toList());
+
+        return dto;
+    }
+
+
+
 }

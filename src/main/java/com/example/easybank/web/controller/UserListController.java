@@ -35,6 +35,18 @@ public class UserListController {
 
     }
 
+    @GetMapping(USER_LIST + "/{id}")
+    public ResponseEntity<GenericResponse> getUserById(@PathVariable("id")  UUID id) throws Exception {
+        UserResponseDTO user = userListService.getUserById(id);
+
+        return GenericResponse.builder()
+                .data(user)
+                .message("User found")
+                .status(HttpStatus.OK)
+                .build().buildResponse();
+    }
+
+
     @DeleteMapping(USER_LIST + DELETE + "/{id}")
     public ResponseEntity<GenericResponse> deleteUser(@PathVariable("id") UUID id) throws Exception {
         userListService.delete(id);
@@ -55,6 +67,10 @@ public class UserListController {
                 .message("Roles updated successfully")
                 .build().buildResponse();
     }
+
+
+
+
 
 
 

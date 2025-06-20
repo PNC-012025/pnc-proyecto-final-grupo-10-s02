@@ -10,5 +10,7 @@ public interface UserListService {
     List<UserResponseDTO> findAllUsers() throws Exception;
     void delete(UUID id) throws Exception;
     void changeRoles(UUID id, List<String> roles);
+    UserResponseDTO getUserById(UUID id);
+
 
 }
