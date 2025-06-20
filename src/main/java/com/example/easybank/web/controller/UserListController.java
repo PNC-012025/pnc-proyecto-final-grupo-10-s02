@@ -2,6 +2,7 @@ package com.example.easybank.web.controller;
 
 
 import com.example.easybank.application.dto.request.ChangeRoleRequestDTO;
+import com.example.easybank.application.dto.response.AccountResponseDTO;
 import com.example.easybank.application.dto.response.UserResponseDTO;
 import com.example.easybank.application.service.UserListService;
 import com.example.easybank.util.GenericResponse;
@@ -67,6 +68,13 @@ public class UserListController {
                 .message("Roles updated successfully")
                 .build().buildResponse();
     }
+
+    @GetMapping(USER_LIST+ "/{id}/accounts")
+    public ResponseEntity<List<AccountResponseDTO>> getUserAccounts(@PathVariable ("id") UUID id) {
+        List<AccountResponseDTO> accounts = userListService.getUserAccounts(id);
+        return ResponseEntity.ok(accounts);
+    }
+
 
 
 
