@@ -2,10 +2,8 @@ package com.example.easybank.web.controller;
 
 
 import com.example.easybank.application.dto.request.ChangeRoleRequestDTO;
-import com.example.easybank.application.dto.response.AccountResponseDTO;
-import com.example.easybank.application.dto.response.BillResponseDTO;
-import com.example.easybank.application.dto.response.TransactionResponseDTO;
-import com.example.easybank.application.dto.response.UserResponseDTO;
+import com.example.easybank.application.dto.request.DepositRequestDTO;
+import com.example.easybank.application.dto.response.*;
 import com.example.easybank.application.service.UserListService;
 import com.example.easybank.util.GenericResponse;
 import lombok.RequiredArgsConstructor;
@@ -73,7 +71,7 @@ public class UserListController {
 
     @GetMapping(USER_LIST + "/{id}/accounts")
     public ResponseEntity<GenericResponse> getUserAccounts(@PathVariable ("id") UUID id) {
-        List<AccountResponseDTO> accounts = userListService.getUserAccounts(id);
+        List<AccountResponseAdminDTO> accounts = userListService.getUserAccounts(id);
         return GenericResponse.builder()
                 .data(accounts)
                 .message("User's accounts found")
@@ -105,6 +103,21 @@ public class UserListController {
                 .status(HttpStatus.OK)
                 .build().buildResponse();
     }
+
+
+    @PostMapping(USER_LIST + "/{id}/deposit")
+    public ResponseEntity<GenericResponse> depositToUserAccount(
+            @PathVariable UUID id,
+            @RequestBody DepositRequestDTO request) {
+
+        userListService.depositToUserAccount(id, request.getAccountId(), request.getAmount(), request.getDescription());
+
+        return GenericResponse.builder()
+                .status(HttpStatus.OK)
+                .message("Deposit completed successfully")
+                .build().buildResponse();
+    }
+
 
 
 

@@ -1,6 +1,7 @@
 package com.example.easybank.application.mapper;
 
 import com.example.easybank.application.dto.AccountCreateDTO;
+import com.example.easybank.application.dto.response.AccountResponseAdminDTO;
 import com.example.easybank.application.dto.response.AccountResponseDTO;
 import com.example.easybank.domain.entity.Account;
 
@@ -18,14 +19,16 @@ public class AccountMapper {
                 .build();
     }
 
-    public static AccountResponseDTO toDTO(Account account) {
-            return AccountResponseDTO.builder()
-                    .firstName(account.getUser().getFirstName())
-                    .lastName(account.getUser().getLastName())
-                    .accountNumber(account.getNumber())
-                    .accountNumber(account.getNumber())
 
-                    .build();
+    public static AccountResponseAdminDTO toAdminDTO(Account account) {
+        return AccountResponseAdminDTO.builder()
+                .id(account.getId())
+                .firstName(account.getUser().getFirstName())
+                .lastName(account.getUser().getLastName())
+                .accountNumber(account.getNumber())
+                .balance(account.getBalance())
+
+                .build();
 
     }
 }

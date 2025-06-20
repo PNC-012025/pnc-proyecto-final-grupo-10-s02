@@ -1,24 +1,15 @@
 package com.example.easybank.application.service.implementation;
 
 
-import com.example.easybank.application.dto.response.AccountResponseDTO;
-import com.example.easybank.application.dto.response.BillResponseDTO;
-import com.example.easybank.application.dto.response.TransactionResponseDTO;
-import com.example.easybank.application.dto.response.UserResponseDTO;
+import com.example.easybank.application.dto.response.*;
 import com.example.easybank.application.mapper.AccountMapper;
 import com.example.easybank.application.mapper.BillMapper;
 import com.example.easybank.application.mapper.TransactionMapper;
 import com.example.easybank.application.mapper.UserMapper;
 import com.example.easybank.application.service.UserListService;
-import com.example.easybank.domain.entity.Bill;
-import com.example.easybank.domain.entity.Role;
-import com.example.easybank.domain.entity.Transaction;
-import com.example.easybank.domain.entity.UserData;
+import com.example.easybank.domain.entity.*;
 import com.example.easybank.domain.exception.ModelNotFoundException;
-import com.example.easybank.infrastructure.repository.BillRepository;
-import com.example.easybank.infrastructure.repository.RoleRepository;
-import com.example.easybank.infrastructure.repository.TransactionRepository;
-import com.example.easybank.infrastructure.repository.UserRepository;
+import com.example.easybank.infrastructure.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +19,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import org.springframework.data.domain.Pageable;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -39,6 +33,7 @@ public class UserListServiceImpl implements UserListService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final TransactionRepository transactionRepository;
+    private final AccountRepository accountRepository;
 
 
     @Override
@@ -84,12 +79,12 @@ public class UserListServiceImpl implements UserListService {
 
     @Override
     @Transactional//(readOnly = true)
-    public List<AccountResponseDTO> getUserAccounts(UUID userId) {
+    public List<AccountResponseAdminDTO> getUserAccounts(UUID userId) {
         UserData user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
         return user.getAccounts().stream()
-                .map(AccountMapper::toDTO)
+                .map(AccountMapper::toAdminDTO)
                 .toList();
     }
 
@@ -119,6 +114,36 @@ public class UserListServiceImpl implements UserListService {
                 .map(TransactionMapper::toDTO)
                 .toList();
     }
+
+    @Override
+    @Transactional
+    public void depositToUserAccount(UUID userId, UUID accountId, BigDecimal amount, String description) {
+
+        UserData user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+        Account account = accountRepository.findById(accountId)
+                .orElseThrow(() -> new EntityNotFoundException("Account not found"));
+
+        if (!account.getUser().getId().equals(userId)) {
+            throw new IllegalArgumentException("Account does not belong to user");
+        }
+
+        Transaction depositTx = Transaction.builder()
+                .originAccount(null)
+                .destinationAccount(account)
+                .amount(amount)
+                .type("DEPOSIT")
+                .description(description)
+                .dateTime(LocalDateTime.now())
+                .build();
+
+        transactionRepository.save(depositTx);
+
+        account.setBalance(account.getBalance().add(amount));
+        accountRepository.save(account);
+    }
+
 
 
 
