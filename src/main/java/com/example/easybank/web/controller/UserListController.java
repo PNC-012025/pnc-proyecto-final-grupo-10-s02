@@ -4,6 +4,7 @@ package com.example.easybank.web.controller;
 import com.example.easybank.application.dto.request.ChangeRoleRequestDTO;
 import com.example.easybank.application.dto.response.AccountResponseDTO;
 import com.example.easybank.application.dto.response.BillResponseDTO;
+import com.example.easybank.application.dto.response.TransactionResponseDTO;
 import com.example.easybank.application.dto.response.UserResponseDTO;
 import com.example.easybank.application.service.UserListService;
 import com.example.easybank.util.GenericResponse;
@@ -90,6 +91,20 @@ public class UserListController {
                 .build().buildResponse();
     }
 
+    @GetMapping(USER_LIST + "/{id}/transactions")
+    public ResponseEntity<GenericResponse> getUserTransactions(
+            @PathVariable ("id") UUID id,
+            @RequestParam(defaultValue = "10") int limit,
+            @RequestParam(defaultValue = "0") int page) {
+
+        List<TransactionResponseDTO> transactions = userListService.getUserTransactions(id, limit, page);
+
+        return GenericResponse.builder()
+                .data(transactions)
+                .message("User's transactions found")
+                .status(HttpStatus.OK)
+                .build().buildResponse();
+    }
 
 
 

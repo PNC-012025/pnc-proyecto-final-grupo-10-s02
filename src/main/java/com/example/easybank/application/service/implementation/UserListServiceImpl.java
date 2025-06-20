@@ -3,22 +3,31 @@ package com.example.easybank.application.service.implementation;
 
 import com.example.easybank.application.dto.response.AccountResponseDTO;
 import com.example.easybank.application.dto.response.BillResponseDTO;
+import com.example.easybank.application.dto.response.TransactionResponseDTO;
 import com.example.easybank.application.dto.response.UserResponseDTO;
 import com.example.easybank.application.mapper.AccountMapper;
 import com.example.easybank.application.mapper.BillMapper;
+import com.example.easybank.application.mapper.TransactionMapper;
 import com.example.easybank.application.mapper.UserMapper;
 import com.example.easybank.application.service.UserListService;
 import com.example.easybank.domain.entity.Bill;
 import com.example.easybank.domain.entity.Role;
+import com.example.easybank.domain.entity.Transaction;
 import com.example.easybank.domain.entity.UserData;
 import com.example.easybank.domain.exception.ModelNotFoundException;
+import com.example.easybank.infrastructure.repository.BillRepository;
 import com.example.easybank.infrastructure.repository.RoleRepository;
+import com.example.easybank.infrastructure.repository.TransactionRepository;
 import com.example.easybank.infrastructure.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -29,6 +38,7 @@ import java.util.stream.Collectors;
 public class UserListServiceImpl implements UserListService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final TransactionRepository transactionRepository;
 
 
     @Override
@@ -83,6 +93,8 @@ public class UserListServiceImpl implements UserListService {
                 .toList();
     }
 
+    @Override
+    @Transactional//(readOnly = true)
     public List<BillResponseDTO> getUserBills(UUID userId) {
         UserData user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
@@ -91,6 +103,27 @@ public class UserListServiceImpl implements UserListService {
                 .map(BillMapper::toDTO)
                 .toList();
     }
+
+    @Override
+    @Transactional//(readOnly = true)
+    public List<TransactionResponseDTO> getUserTransactions(UUID userId, int limit, int page) {
+
+        UserData user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+        Pageable pageable = PageRequest.of(page, limit, Sort.by("dateTime").descending());
+
+        Page<Transaction> pageResult = transactionRepository.findByOriginAccount_User(user, pageable);
+
+        return pageResult.getContent().stream()
+                .map(TransactionMapper::toDTO)
+                .toList();
+    }
+
+
+
+
+
 
 
 
