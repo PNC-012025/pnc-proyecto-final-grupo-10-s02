@@ -2,8 +2,10 @@ package com.example.easybank.application.service.implementation;
 
 
 import com.example.easybank.application.dto.response.AccountResponseDTO;
+import com.example.easybank.application.dto.response.BillResponseDTO;
 import com.example.easybank.application.dto.response.UserResponseDTO;
 import com.example.easybank.application.mapper.AccountMapper;
+import com.example.easybank.application.mapper.BillMapper;
 import com.example.easybank.application.mapper.UserMapper;
 import com.example.easybank.application.service.UserListService;
 import com.example.easybank.domain.entity.Bill;
@@ -78,6 +80,15 @@ public class UserListServiceImpl implements UserListService {
 
         return user.getAccounts().stream()
                 .map(AccountMapper::toDTO)
+                .toList();
+    }
+
+    public List<BillResponseDTO> getUserBills(UUID userId) {
+        UserData user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+        return user.getBills().stream()
+                .map(BillMapper::toDTO)
                 .toList();
     }
 
