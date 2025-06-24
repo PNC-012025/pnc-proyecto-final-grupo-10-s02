@@ -17,6 +17,7 @@ import com.example.easybank.infrastructure.repository.UserRepository;
 import com.example.easybank.infrastructure.security.JwtTokenProvider;
 import com.example.easybank.util.AccountNumberGenerator;
 import com.example.easybank.util.PasswordUtil;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -30,6 +31,7 @@ import java.beans.Transient;
 import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -61,8 +63,10 @@ public class AuthServiceImpl implements AuthService {
 
         UserData user = UserMapper.toEntity(registerDTO);
 
-        List<Role> roles = roleRepository.findByName("USER");
-        user.setRoles(new HashSet<>(roles));
+        Optional<Role> role = roleRepository.findByName("ROLE_USER");
+        Role userRole = role.orElseThrow(() -> new EntityNotFoundException("Role not found"));
+        user.setRoles(Set.of(userRole));
+
         UserData userSaved = userRepository.save(user);
 
         AccountCreateDTO accountCreateDTO = AccountCreateDTO.builder()
