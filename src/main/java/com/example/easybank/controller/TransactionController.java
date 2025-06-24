@@ -1,6 +1,7 @@
 package com.example.easybank.controller;
 
 import com.example.easybank.domain.dto.request.TransactionRequestDTO;
+import com.example.easybank.domain.dto.response.AdminTransactionResponseDTO;
 import com.example.easybank.domain.dto.response.TransactionResponseDTO;
 import com.example.easybank.service.TransactionService;
 import com.example.easybank.util.GenericResponse;
@@ -31,6 +32,16 @@ public class TransactionController {
     @GetMapping(FIND_OWN)
     public ResponseEntity<GenericResponse> findOwnTransaction() throws Exception {
         List<TransactionResponseDTO> transactions = transactionService.findMyOwnTransactions();
+        return GenericResponse.builder()
+                .data(transactions)
+                .message("Transactions found")
+                .status(HttpStatus.OK)
+                .build().buildResponse();
+    }
+
+    @GetMapping(FIND_ALL)
+    public ResponseEntity<GenericResponse> findAllTransactions() throws Exception {
+        List<AdminTransactionResponseDTO> transactions = transactionService.findAllTransactions();
         return GenericResponse.builder()
                 .data(transactions)
                 .message("Transactions found")

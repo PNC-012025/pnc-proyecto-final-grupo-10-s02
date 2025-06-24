@@ -52,7 +52,7 @@ public class Security {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests((authorizeRequests) -> {
                     authorizeRequests
-                            .requestMatchers(API + ADMIN + "/**").hasAuthority("ADMIN")
+                            //.requestMatchers(API + ADMIN + "/**").hasAuthority("ADMIN")
                             .requestMatchers(API + AUTH + LOGIN).permitAll()
                             .requestMatchers(API + AUTH + REGISTER).permitAll()
                             .anyRequest().authenticated();

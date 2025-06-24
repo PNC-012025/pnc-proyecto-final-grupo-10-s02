@@ -74,12 +74,6 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public TokenResponse login(LoginDTO loginDTO) throws Exception {
-
-        String rawPassword = "admin123";
-        String hashed = "$2a$10$uU2LbWpxEbTfw06jgrUZGOGJDNZ5Y09PPN8WWpJhkfvP9uyx2guVa";
-
-        boolean match = new BCryptPasswordEncoder().matches(rawPassword, hashed);
-        System.out.println("¿Coincide? " + match); // debe imprimir true
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginDTO.getUsername(),

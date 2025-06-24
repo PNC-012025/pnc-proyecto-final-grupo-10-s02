@@ -1,5 +1,7 @@
 package com.example.easybank.service.implementation;
 
+import com.example.easybank.domain.dto.response.AdminTransactionResponseDTO;
+import com.example.easybank.domain.dto.response.UserTransactionResponseDTO;
 import com.example.easybank.exception.InsufficientFundsException;
 import com.example.easybank.exception.InvalidTransferException;
 import com.example.easybank.exception.ModelNotFoundException;
@@ -19,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import javax.lang.model.util.Elements;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -114,4 +117,33 @@ public class TransactionServiceImpl implements TransactionService {
 
         return finalResponse;
     }
+
+    @Override
+    public List<AdminTransactionResponseDTO> findAllTransactions() throws Exception {
+        List<Transaction> transactions = transactionRepository.findAll();
+
+        return transactions.stream().map(transaction -> {
+            return AdminTransactionResponseDTO.builder()
+                    .transactionId(transaction.getId())
+                    .amount(transaction.getAmount())
+                    .date(transaction.getDateTime())
+                    .originAccount(
+                            UserTransactionResponseDTO.builder()
+                                    .accountOwner(transaction.getOriginAccount().getUser().getFirstName()
+                                            + " " + transaction.getOriginAccount().getUser().getLastName())
+                                    .accountNumber(transaction.getOriginAccount().getNumber())
+                                    .build()
+                    )
+                    .destinationAccount(
+                            UserTransactionResponseDTO.builder()
+                                    .accountOwner(transaction.getDestinationAccount().getUser().getFirstName()
+                                            + " " + transaction.getDestinationAccount().getUser().getLastName())
+                                    .accountNumber(transaction.getDestinationAccount().getNumber())
+                                    .build()
+                    )
+                    .build();
+        }).toList();
+    }
+
+
 }

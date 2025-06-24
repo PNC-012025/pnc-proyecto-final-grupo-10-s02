@@ -25,7 +25,6 @@ import static com.example.easybank.util.Constant.*;
 public class UserController {
     private final UserService userListService;
 
-
     @GetMapping(USER_LIST)
     public ResponseEntity<GenericResponse> getAllUsers() throws Exception {
         List<UserResponseDTO> users = userListService.findAllUsers();
@@ -35,7 +34,6 @@ public class UserController {
                 .message("Users found")
                 .status(HttpStatus.OK)
                 .build().buildResponse();
-
     }
 
     @GetMapping(USER_LIST + "/{id}")
@@ -95,7 +93,8 @@ public class UserController {
     public ResponseEntity<GenericResponse> getUserTransactions(
             @PathVariable ("id") UUID id,
             @RequestParam(defaultValue = "10") int limit,
-            @RequestParam(defaultValue = "0") int page) {
+            @RequestParam(defaultValue = "0") int page
+    ) {
 
         List<TransactionResponseDTO> transactions = userListService.getUserTransactions(id, limit, page);
 
@@ -110,7 +109,8 @@ public class UserController {
     @PostMapping(USER_LIST + "/{id}/deposit")
     public ResponseEntity<GenericResponse> depositToUserAccount(
             @PathVariable UUID id,
-            @RequestBody DepositRequestDTO request) {
+            @RequestBody DepositRequestDTO request
+    ) {
 
         userListService.depositToUserAccount(id, request.getAccountId(), request.getAmount(), request.getDescription());
 
