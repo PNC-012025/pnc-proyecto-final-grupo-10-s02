@@ -43,14 +43,16 @@ public class AdminServiceImpl implements AdminService {
 
 
     @Override
-    public List<UserResponseDTO> findAllUsers() throws Exception {
+    public List<UserResponseDTO> findAllUsers() {
         return UserMapper.toDTOList(userRepository.findAll());
     }
 
     @Override
-    public void delete(UUID id) throws Exception {
+    public void delete(UUID id) {
+        UserData user = userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
-        userRepository.deleteById(id);
+        userRepository.delete(user);
     }
 
     @Override
