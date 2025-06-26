@@ -13,6 +13,7 @@ import com.example.easybank.repository.TransactionRepository;
 import com.example.easybank.repository.UserRepository;
 import com.example.easybank.util.generator.RandomCreditCardGenerator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataAccessException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -73,21 +74,21 @@ public class TransactionServiceImpl implements TransactionService {
         try{
             accountRepository.save(originAccount);
         }
-        catch (Exception e){
-            throw new StorageException("Failed to update account");
+        catch (DataAccessException e){
+            throw new StorageException("Failed to update origin account");
         }
 
         try{
             accountRepository.save(destinationAccount);
         }
-        catch (Exception e){
-            throw new StorageException("Failed to update account");
+        catch (DataAccessException e){
+            throw new StorageException("Failed to update destination account");
         }
 
         try{
             transactionRepository.save(transaction);
         }
-        catch (Exception e){
+        catch (DataAccessException e){
             throw new StorageException("Failed to save transaction");
         }
 

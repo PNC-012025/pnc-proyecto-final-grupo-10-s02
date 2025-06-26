@@ -47,6 +47,23 @@ public class GlobalExceptionHandler {
     }
 
 
+    @ExceptionHandler(UnauthorizedAccess.class)
+    public ResponseEntity<GenericResponse> handleUnauthorizedAccess(
+            UnauthorizedAccess ex,
+            WebRequest request
+    ) {
+        CustomErrorResponse errorResponse = new CustomErrorResponse(
+                LocalDate.now(),
+                ex.getMessage(),
+                request.getDescription(false)
+        );
+        return GenericResponse.builder()
+                .data(errorResponse)
+                .status(HttpStatus.UNAUTHORIZED)
+                .build().buildResponse();
+    }
+
+
     @ExceptionHandler(StorageException.class)
     public ResponseEntity<GenericResponse> handleStorage(
             StorageException ex,

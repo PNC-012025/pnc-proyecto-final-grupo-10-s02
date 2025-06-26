@@ -12,6 +12,7 @@ import com.example.easybank.repository.AccountRepository;
 import com.example.easybank.repository.BillRepository;
 import com.example.easybank.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataAccessException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -50,7 +51,7 @@ public class BillServiceImpl implements BillService {
         try{
             billRepository.save(bill);
         }
-        catch (Exception e){
+        catch (DataAccessException e){
             throw new StorageException("Failed to save bill");
         }
     }
@@ -112,14 +113,14 @@ public class BillServiceImpl implements BillService {
         try{
             billRepository.save(bill);
         }
-        catch (Exception e){
+        catch (DataAccessException e){
             throw new StorageException("Failed to save bill");
         }
 
         try{
             accountRepository.save(account);
         }
-        catch (Exception e){
+        catch (DataAccessException e){
             throw new StorageException("Failed to update account");
         }
 

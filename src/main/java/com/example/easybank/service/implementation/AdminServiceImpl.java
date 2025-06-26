@@ -19,6 +19,7 @@ import jakarta.persistence.EntityNotFoundException;
 import com.example.easybank.exception.StorageException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -71,7 +72,7 @@ public class AdminServiceImpl implements AdminService {
         try{
             userRepository.save(user);
         }
-        catch (Exception e){
+        catch (DataAccessException e){
             throw new StorageException("Failed to update user");
         }
 
@@ -155,7 +156,7 @@ public class AdminServiceImpl implements AdminService {
         try{
             transactionRepository.save(depositTx);
         }
-        catch (Exception e){
+        catch (DataAccessException e){
             throw new StorageException("Failed to save transaction");
         }
 
@@ -165,7 +166,7 @@ public class AdminServiceImpl implements AdminService {
         try{
             accountRepository.save(account);
         }
-        catch (Exception e){
+        catch (DataAccessException e){
             throw new StorageException("Failed to update account");
         }
     }

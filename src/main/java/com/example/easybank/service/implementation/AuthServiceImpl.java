@@ -20,6 +20,7 @@ import com.example.easybank.security.JwtTokenProvider;
 import com.example.easybank.util.AccountNumberGenerator;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataAccessException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -78,7 +79,7 @@ public class AuthServiceImpl implements AuthService {
         try{
             accountServiceImpl.save(accountCreateDTO);
         }
-        catch (Exception e){
+        catch (DataAccessException e){
             throw new StorageException("Failed to register account");
         }
 
