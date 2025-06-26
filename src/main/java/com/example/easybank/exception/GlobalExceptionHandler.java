@@ -26,7 +26,7 @@ public class GlobalExceptionHandler {
         );
         return GenericResponse.builder()
                 .data(errorResponse)
-                .status(HttpStatus.NOT_FOUND)
+                .status(HttpStatus.I_AM_A_TEAPOT)
                 .build().buildResponse();
     }
 

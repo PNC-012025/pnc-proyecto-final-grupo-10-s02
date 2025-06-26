@@ -1,10 +1,7 @@
 package com.example.easybank.service;
 
 
-import com.example.easybank.domain.dto.response.AccountResponseAdminDTO;
-import com.example.easybank.domain.dto.response.BillResponseDTO;
-import com.example.easybank.domain.dto.response.TransactionResponseDTO;
-import com.example.easybank.domain.dto.response.UserResponseDTO;
+import com.example.easybank.domain.dto.response.*;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -17,8 +14,8 @@ public interface AdminService {
     UserResponseDTO getUserById(UUID id);
     List<AccountResponseAdminDTO> getUserAccounts(UUID id);
     List<BillResponseDTO> getUserBills(UUID id);
-    List<TransactionResponseDTO> getUserTransactions(UUID userId, int limit, int page);
+    List<AdminTransactionResponseDTO> getUserTransactions(UUID userId, int limit, int page);
     void depositToUserAccount(UUID userId, UUID accountId, BigDecimal amount, String description);
-
+    public List<AdminTransactionResponseDTO> findAll() throws Exception;
 
 }
