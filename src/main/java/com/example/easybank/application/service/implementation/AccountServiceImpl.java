@@ -8,6 +8,7 @@ import com.example.easybank.domain.entity.Account;
 import com.example.easybank.domain.entity.UserData;
 import com.example.easybank.domain.exception.AlreadyExistsException;
 import com.example.easybank.domain.exception.ModelNotFoundException;
+import com.example.easybank.domain.exception.StorageException;
 import com.example.easybank.infrastructure.repository.AccountRepository;
 import com.example.easybank.infrastructure.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +30,12 @@ public class AccountServiceImpl implements AccountService {
 
         Account account = AccountMapper.toEntity(accountCreate);
 
-        accountRepository.save(account);
+        try{
+            accountRepository.save(account);
+        }
+        catch(Exception e){
+            throw new StorageException("Failed to store account in database");
+        }
     }
 
     @Override

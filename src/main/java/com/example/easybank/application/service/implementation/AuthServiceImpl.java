@@ -12,6 +12,7 @@ import com.example.easybank.domain.entity.Role;
 import com.example.easybank.domain.entity.UserData;
 import com.example.easybank.domain.exception.AlreadyExistsException;
 import com.example.easybank.domain.exception.ModelNotFoundException;
+import com.example.easybank.domain.exception.StorageException;
 import com.example.easybank.infrastructure.repository.RoleRepository;
 import com.example.easybank.infrastructure.repository.UserRepository;
 import com.example.easybank.infrastructure.security.JwtTokenProvider;
@@ -67,6 +68,7 @@ public class AuthServiceImpl implements AuthService {
         Role userRole = role.orElseThrow(() -> new EntityNotFoundException("Role not found"));
         user.setRoles(Set.of(userRole));
 
+
         UserData userSaved = userRepository.save(user);
 
         AccountCreateDTO accountCreateDTO = AccountCreateDTO.builder()
@@ -77,7 +79,13 @@ public class AuthServiceImpl implements AuthService {
                 .userData(userSaved)
                 .build();
 
-        accountServiceImpl.save(accountCreateDTO);
+        try{
+            accountServiceImpl.save(accountCreateDTO);
+        }
+        catch (Exception e){
+            throw new StorageException("Failed to register account");
+        }
+
     }
 
     @Override

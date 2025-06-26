@@ -70,9 +70,27 @@ public class TransactionServiceImpl implements TransactionService {
         transaction.setDateTime(LocalDateTime.now());
         transaction.setType("TRANSFER");
 
-        accountRepository.save(originAccount);
-        accountRepository.save(destinationAccount);
-        transactionRepository.save(transaction);
+        try{
+            accountRepository.save(originAccount);
+        }
+        catch (Exception e){
+            throw new StorageException("Failed to update account");
+        }
+
+        try{
+            accountRepository.save(destinationAccount);
+        }
+        catch (Exception e){
+            throw new StorageException("Failed to update account");
+        }
+
+        try{
+            transactionRepository.save(transaction);
+        }
+        catch (Exception e){
+            throw new StorageException("Failed to save transaction");
+        }
+
     }
 
     @Override

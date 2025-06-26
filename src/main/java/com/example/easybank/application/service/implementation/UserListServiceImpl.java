@@ -9,6 +9,7 @@ import com.example.easybank.application.mapper.UserMapper;
 import com.example.easybank.application.service.UserListService;
 import com.example.easybank.domain.entity.*;
 import com.example.easybank.domain.exception.ModelNotFoundException;
+import com.example.easybank.domain.exception.StorageException;
 import com.example.easybank.infrastructure.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -59,7 +60,13 @@ public class UserListServiceImpl implements UserListService {
 
         user.setRoles(newRoles);
 
-        userRepository.save(user);
+
+        try{
+            userRepository.save(user);
+        }
+        catch (Exception e){
+            throw new StorageException("Failed to update user");
+        }
 
     }
 
@@ -138,10 +145,22 @@ public class UserListServiceImpl implements UserListService {
                 .dateTime(LocalDateTime.now())
                 .build();
 
-        transactionRepository.save(depositTx);
+        try{
+            transactionRepository.save(depositTx);
+        }
+        catch (Exception e){
+            throw new StorageException("Failed to save transaction");
+        }
+
 
         account.setBalance(account.getBalance().add(amount));
-        accountRepository.save(account);
+
+        try{
+            accountRepository.save(account);
+        }
+        catch (Exception e){
+            throw new StorageException("Failed to update account");
+        }
     }
 
 

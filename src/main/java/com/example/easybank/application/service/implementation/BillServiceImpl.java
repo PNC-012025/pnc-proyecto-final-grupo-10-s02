@@ -48,7 +48,12 @@ public class BillServiceImpl implements BillService {
         bill.setUser(user);
         bill.setState("PENDING");
 
-        billRepository.save(bill);
+        try{
+            billRepository.save(bill);
+        }
+        catch (Exception e){
+            throw new StorageException("Failed to save bill");
+        }
     }
 
     @Override
@@ -104,7 +109,20 @@ public class BillServiceImpl implements BillService {
         account.setBalance(account.getBalance().subtract(bill.getAmount()));
         bill.setState("PAID");
 
-        billRepository.save(bill);
-        accountRepository.save(account);
+
+        try{
+            billRepository.save(bill);
+        }
+        catch (Exception e){
+            throw new StorageException("Failed to save bill");
+        }
+
+        try{
+            accountRepository.save(account);
+        }
+        catch (Exception e){
+            throw new StorageException("Failed to update account");
+        }
+
     }
 }
