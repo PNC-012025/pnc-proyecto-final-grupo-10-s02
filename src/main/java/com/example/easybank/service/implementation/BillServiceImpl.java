@@ -76,9 +76,8 @@ public class BillServiceImpl implements BillService {
         Bill bill = billRepository.findById(id)
                 .orElseThrow(() -> new ModelNotFoundException("Bill not found"));
 
-        // TODO: CREAR EXCEPCION PARA ESTO
         if (!bill.getUser().getUsername().equals(username)) {
-            throw new ModelNotFoundException("User not logged in");
+            throw new AccessDeniedException("You do not have permission to delete this bill.");
         }
 
         billRepository.delete(bill);

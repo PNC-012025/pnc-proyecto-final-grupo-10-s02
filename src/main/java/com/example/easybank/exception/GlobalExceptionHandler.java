@@ -47,22 +47,6 @@ public class GlobalExceptionHandler {
     }
 
 
-    @ExceptionHandler(UnauthorizedAccess.class)
-    public ResponseEntity<GenericResponse> handleUnauthorizedAccess(
-            UnauthorizedAccess ex,
-            WebRequest request
-    ) {
-        CustomErrorResponse errorResponse = new CustomErrorResponse(
-                LocalDate.now(),
-                ex.getMessage(),
-                request.getDescription(false)
-        );
-        return GenericResponse.builder()
-                .data(errorResponse)
-                .status(HttpStatus.UNAUTHORIZED)
-                .build().buildResponse();
-    }
-
 
     @ExceptionHandler(StorageException.class)
     public ResponseEntity<GenericResponse> handleStorage(
@@ -79,10 +63,6 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .build().buildResponse();
     }
-
-
-
-
 
 
 
@@ -163,6 +143,22 @@ public class GlobalExceptionHandler {
         return GenericResponse.builder()
                 .data(errorResponse)
                 .status(HttpStatus.BAD_REQUEST)
+                .build().buildResponse();
+    }
+
+    @ExceptionHandler(EmptyCardListException.class)
+    public ResponseEntity<GenericResponse> handleEmptyCardList(
+            EmptyCardListException ex,
+            WebRequest request
+    ) {
+        CustomErrorResponse errorResponse = new CustomErrorResponse(
+                LocalDate.now(),
+                ex.getMessage(),
+                request.getDescription(false)
+        );
+        return GenericResponse.builder()
+                .data(errorResponse)
+                .status(HttpStatus.NOT_FOUND)
                 .build().buildResponse();
     }
 

@@ -3,6 +3,7 @@ package com.example.easybank.service.implementation;
 import com.example.easybank.domain.dto.AccountCreateDTO;
 import com.example.easybank.domain.dto.response.AccountResponseDTO;
 import com.example.easybank.domain.mapper.AccountMapper;
+import com.example.easybank.exception.EmptyCardListException;
 import com.example.easybank.service.AccountService;
 import com.example.easybank.domain.entity.Account;
 import com.example.easybank.domain.entity.UserData;
@@ -50,9 +51,8 @@ public class AccountServiceImpl implements AccountService {
         UserData user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ModelNotFoundException("User not found"));
 
-        // TODO: Hacer excepcion para este if
         if (user.getCards().isEmpty()) {
-            throw new ModelNotFoundException("Cards not found");
+            throw new EmptyCardListException("User has no registered cards.");
         }
 
         Account account = user.getAccounts().getFirst();
