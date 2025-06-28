@@ -9,4 +9,5 @@ import java.util.UUID;
 
 public interface BillRepository extends JpaRepository<Bill, UUID> {
     public List<Bill> getBillsById(UUID id);
+    public List<Bill> getBillByState(String state);
 }
