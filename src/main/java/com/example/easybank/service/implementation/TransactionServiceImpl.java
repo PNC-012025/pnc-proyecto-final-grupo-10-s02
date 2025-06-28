@@ -129,7 +129,7 @@ public class TransactionServiceImpl implements TransactionService {
                         .build()).toList();
 
         List<TransactionResponseDTO> transactionBill = billRepository.
-                getBillByState("PAID").stream().map(bill -> TransactionResponseDTO.builder()
+                findBillsByStateAndUser("PAID", user).stream().map(bill -> TransactionResponseDTO.builder()
                         .id(bill.getId())
                         .name(bill.getUser().getFirstName() + " " + bill.getUser().getLastName())
                         .accountNumber(bill.getUser().getAccounts().getFirst().getNumber())
