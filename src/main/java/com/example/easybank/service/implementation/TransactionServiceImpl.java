@@ -2,8 +2,13 @@ package com.example.easybank.service.implementation;
 
 import com.example.easybank.domain.dto.request.TransactionRequestDTO;
 import com.example.easybank.domain.dto.response.TransactionResponseDTO;
+import com.example.easybank.domain.entity.Bill;
 import com.example.easybank.domain.mapper.TransactionMapper;
-import com.example.easybank.exception.*;
+import com.example.easybank.exception.InsufficientFundsException;
+import com.example.easybank.exception.InvalidTransferException;
+import com.example.easybank.exception.ModelNotFoundException;
+import com.example.easybank.exception.RecipientNameMismatchException;
+import com.example.easybank.repository.BillRepository;
 import com.example.easybank.service.TransactionService;
 import com.example.easybank.domain.entity.Account;
 import com.example.easybank.domain.entity.Transaction;
@@ -19,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +35,7 @@ public class TransactionServiceImpl implements TransactionService {
     private final UserRepository userRepository;
     private final AccountRepository accountRepository;
     private final RandomCreditCardGenerator randomCreditCardGenerator;
+    private final BillRepository billRepository;
 
     @Override
     public void createTransaction(TransactionRequestDTO transactionRequestDTO) throws Exception {
@@ -124,9 +131,21 @@ public class TransactionServiceImpl implements TransactionService {
                         .type("RECEIVER")
                         .build()).toList();
 
+        List<TransactionResponseDTO> transactionBill = billRepository.
+                getBillByState("PAID").stream().map(bill -> TransactionResponseDTO.builder()
+                        .id(bill.getId())
+                        .name(bill.getUser().getFirstName() + " " + bill.getUser().getLastName())
+                        .accountNumber("")
+                        .amount(bill.getAmount())
+                        .description(bill.getName())
+                        .date(bill.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())
+                        .type("SENDER")
+                        .build()).toList();
+
         List<TransactionResponseDTO> finalResponse = new ArrayList<>();
         finalResponse.addAll(transactionResponseOriginDTOS);
         finalResponse.addAll(transactionResponseDestinationDTOS);
+        finalResponse.addAll(transactionBill);
 
         return finalResponse;
     }

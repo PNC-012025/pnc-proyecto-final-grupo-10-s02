@@ -65,8 +65,12 @@ public class BillServiceImpl implements BillService {
 
         return user.getBills()
                 .stream()
-                .map(BillMapper::toDTO)
-                .toList();
+                .map(bill -> {
+                    if (bill.getState().equals("PENDING")) {
+                        return BillMapper.toDTO(bill);
+                    }
+                    return null;
+                }).toList();
     }
 
     @Override
