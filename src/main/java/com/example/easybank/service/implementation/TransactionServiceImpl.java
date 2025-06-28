@@ -132,7 +132,7 @@ public class TransactionServiceImpl implements TransactionService {
                 getBillByState("PAID").stream().map(bill -> TransactionResponseDTO.builder()
                         .id(bill.getId())
                         .name(bill.getUser().getFirstName() + " " + bill.getUser().getLastName())
-                        .accountNumber("")
+                        .accountNumber(bill.getUser().getAccounts().getFirst().getNumber())
                         .amount(bill.getAmount())
                         .description(bill.getName())
                         .date(bill.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())
