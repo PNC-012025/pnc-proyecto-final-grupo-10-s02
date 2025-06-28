@@ -18,6 +18,7 @@ import com.example.easybank.repository.TransactionRepository;
 import com.example.easybank.repository.UserRepository;
 import com.example.easybank.util.generator.RandomCreditCardGenerator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataAccessException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -77,9 +78,27 @@ public class TransactionServiceImpl implements TransactionService {
         transaction.setDateTime(LocalDateTime.now());
         transaction.setType("TRANSFER");
 
-        accountRepository.save(originAccount);
-        accountRepository.save(destinationAccount);
-        transactionRepository.save(transaction);
+        try{
+            accountRepository.save(originAccount);
+        }
+        catch (DataAccessException e){
+            throw new StorageException("Failed to update origin account");
+        }
+
+        try{
+            accountRepository.save(destinationAccount);
+        }
+        catch (DataAccessException e){
+            throw new StorageException("Failed to update destination account");
+        }
+
+        try{
+            transactionRepository.save(transaction);
+        }
+        catch (DataAccessException e){
+            throw new StorageException("Failed to save transaction");
+        }
+
     }
 
     @Override

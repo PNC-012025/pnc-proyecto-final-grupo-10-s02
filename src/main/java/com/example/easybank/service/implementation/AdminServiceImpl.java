@@ -10,8 +10,10 @@ import com.example.easybank.repository.UserRepository;
 import com.example.easybank.service.AdminService;
 import com.example.easybank.domain.entity.*;
 import jakarta.persistence.EntityNotFoundException;
+import com.example.easybank.exception.StorageException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -37,14 +39,16 @@ public class AdminServiceImpl implements AdminService {
 
 
     @Override
-    public List<UserResponseDTO> findAllUsers() throws Exception {
+    public List<UserResponseDTO> findAllUsers() {
         return UserMapper.toDTOList(userRepository.findAll());
     }
 
     @Override
-    public void delete(UUID id) throws Exception {
+    public void delete(UUID id) {
+        UserData user = userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
-        userRepository.deleteById(id);
+        userRepository.delete(user);
     }
 
     @Override
@@ -59,7 +63,13 @@ public class AdminServiceImpl implements AdminService {
 
         user.setRoles(newRoles);
 
-        userRepository.save(user);
+
+        try{
+            userRepository.save(user);
+        }
+        catch (DataAccessException e){
+            throw new StorageException("Failed to update user");
+        }
 
     }
 
@@ -158,10 +168,22 @@ public class AdminServiceImpl implements AdminService {
                 .dateTime(LocalDateTime.now())
                 .build();
 
-        transactionRepository.save(depositTx);
+        try{
+            transactionRepository.save(depositTx);
+        }
+        catch (DataAccessException e){
+            throw new StorageException("Failed to save transaction");
+        }
+
 
         account.setBalance(account.getBalance().add(amount));
-        accountRepository.save(account);
+
+        try{
+            accountRepository.save(account);
+        }
+        catch (DataAccessException e){
+            throw new StorageException("Failed to update account");
+        }
     }
 
 

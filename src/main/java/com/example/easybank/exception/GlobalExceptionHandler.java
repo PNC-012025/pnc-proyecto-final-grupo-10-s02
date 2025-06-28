@@ -30,6 +30,40 @@ public class GlobalExceptionHandler {
                 .build().buildResponse();
     }
 
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<GenericResponse> handleInvalidCredentials(
+            InvalidCredentialsException ex,
+            WebRequest request
+    ) {
+        CustomErrorResponse errorResponse = new CustomErrorResponse(
+                LocalDate.now(),
+                ex.getMessage(),
+                request.getDescription(false)
+        );
+        return GenericResponse.builder()
+                .data(errorResponse)
+                .status(HttpStatus.UNAUTHORIZED)
+                .build().buildResponse();
+    }
+
+
+
+    @ExceptionHandler(StorageException.class)
+    public ResponseEntity<GenericResponse> handleStorage(
+            StorageException ex,
+            WebRequest request
+    ) {
+        CustomErrorResponse errorResponse = new CustomErrorResponse(
+                LocalDate.now(),
+                ex.getMessage(),
+                request.getDescription(false)
+        );
+        return GenericResponse.builder()
+                .data(errorResponse)
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .build().buildResponse();
+    }
+
 
 
     @ExceptionHandler(AlreadyExistsException.class)
@@ -112,6 +146,22 @@ public class GlobalExceptionHandler {
                 .build().buildResponse();
     }
 
+    @ExceptionHandler(EmptyCardListException.class)
+    public ResponseEntity<GenericResponse> handleEmptyCardList(
+            EmptyCardListException ex,
+            WebRequest request
+    ) {
+        CustomErrorResponse errorResponse = new CustomErrorResponse(
+                LocalDate.now(),
+                ex.getMessage(),
+                request.getDescription(false)
+        );
+        return GenericResponse.builder()
+                .data(errorResponse)
+                .status(HttpStatus.NOT_FOUND)
+                .build().buildResponse();
+    }
+
     @ExceptionHandler(InvalidTransferException.class)
     public ResponseEntity<GenericResponse> handleInvalidTransfer(
             InvalidTransferException ex,
@@ -146,6 +196,8 @@ public class GlobalExceptionHandler {
 
 
 
+
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<GenericResponse> handleValueOfEntity(MethodArgumentNotValidException e) {
         List<String> errors = e.getFieldErrors().stream()
@@ -157,4 +209,5 @@ public class GlobalExceptionHandler {
                 .message("Validation failed")
                 .build().buildResponse();
     }
+
 }

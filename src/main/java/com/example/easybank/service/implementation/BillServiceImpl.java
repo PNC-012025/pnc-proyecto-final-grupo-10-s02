@@ -12,6 +12,7 @@ import com.example.easybank.repository.AccountRepository;
 import com.example.easybank.repository.BillRepository;
 import com.example.easybank.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataAccessException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -47,7 +48,12 @@ public class BillServiceImpl implements BillService {
         bill.setUser(user);
         bill.setState("PENDING");
 
-        billRepository.save(bill);
+        try{
+            billRepository.save(bill);
+        }
+        catch (DataAccessException e){
+            throw new StorageException("Failed to save bill");
+        }
     }
 
     @Override
@@ -74,9 +80,8 @@ public class BillServiceImpl implements BillService {
         Bill bill = billRepository.findById(id)
                 .orElseThrow(() -> new ModelNotFoundException("Bill not found"));
 
-        // TODO: CREAR EXCEPCION PARA ESTO
         if (!bill.getUser().getUsername().equals(username)) {
-            throw new ModelNotFoundException("User not logged in");
+            throw new AccessDeniedException("You do not have permission to delete this bill.");
         }
 
         billRepository.delete(bill);
@@ -107,7 +112,20 @@ public class BillServiceImpl implements BillService {
         account.setBalance(account.getBalance().subtract(bill.getAmount()));
         bill.setState("PAID");
 
-        billRepository.save(bill);
-        accountRepository.save(account);
+
+        try{
+            billRepository.save(bill);
+        }
+        catch (DataAccessException e){
+            throw new StorageException("Failed to save bill");
+        }
+
+        try{
+            accountRepository.save(account);
+        }
+        catch (DataAccessException e){
+            throw new StorageException("Failed to update account");
+        }
+
     }
 }

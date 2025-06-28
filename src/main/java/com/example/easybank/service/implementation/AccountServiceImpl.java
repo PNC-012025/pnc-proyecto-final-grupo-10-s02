@@ -3,14 +3,17 @@ package com.example.easybank.service.implementation;
 import com.example.easybank.domain.dto.AccountCreateDTO;
 import com.example.easybank.domain.dto.response.AccountResponseDTO;
 import com.example.easybank.domain.mapper.AccountMapper;
+import com.example.easybank.exception.EmptyCardListException;
 import com.example.easybank.service.AccountService;
 import com.example.easybank.domain.entity.Account;
 import com.example.easybank.domain.entity.UserData;
 import com.example.easybank.exception.AlreadyExistsException;
 import com.example.easybank.exception.ModelNotFoundException;
+import com.example.easybank.exception.StorageException;
 import com.example.easybank.repository.AccountRepository;
 import com.example.easybank.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataAccessException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +32,12 @@ public class AccountServiceImpl implements AccountService {
 
         Account account = AccountMapper.toEntity(accountCreate);
 
-        accountRepository.save(account);
+        try{
+            accountRepository.save(account);
+        }
+        catch(DataAccessException e){
+            throw new StorageException("Failed to store account in database");
+        }
     }
 
     @Override
@@ -43,9 +51,8 @@ public class AccountServiceImpl implements AccountService {
         UserData user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ModelNotFoundException("User not found"));
 
-        // TODO: Hacer excepcion para este if
         if (user.getCards().isEmpty()) {
-            throw new ModelNotFoundException("Cards not found");
+            throw new EmptyCardListException("User has no registered cards.");
         }
 
         Account account = user.getAccounts().getFirst();

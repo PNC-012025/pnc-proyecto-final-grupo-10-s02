@@ -6,19 +6,23 @@ import com.example.easybank.domain.dto.request.RegisterDTO;
 import com.example.easybank.domain.dto.response.TokenResponse;
 import com.example.easybank.domain.dto.response.UserResponseDTO;
 import com.example.easybank.domain.mapper.UserMapper;
+import com.example.easybank.exception.InvalidCredentialsException;
 import com.example.easybank.service.AccountService;
 import com.example.easybank.service.AuthService;
 import com.example.easybank.domain.entity.Role;
 import com.example.easybank.domain.entity.UserData;
 import com.example.easybank.exception.AlreadyExistsException;
 import com.example.easybank.exception.ModelNotFoundException;
+import com.example.easybank.exception.StorageException;
 import com.example.easybank.repository.RoleRepository;
 import com.example.easybank.repository.UserRepository;
 import com.example.easybank.security.JwtTokenProvider;
 import com.example.easybank.util.AccountNumberGenerator;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataAccessException;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -72,7 +76,13 @@ public class AuthServiceImpl implements AuthService {
                 .userData(userSaved)
                 .build();
 
-        accountServiceImpl.save(accountCreateDTO);
+        try{
+            accountServiceImpl.save(accountCreateDTO);
+        }
+        catch (DataAccessException e){
+            throw new StorageException("Failed to register account");
+        }
+
     }
 
     @Override
@@ -83,17 +93,29 @@ public class AuthServiceImpl implements AuthService {
 
         boolean match = new BCryptPasswordEncoder().matches(rawPassword, hashed);
         System.out.println("¿Coincide? " + match); // debe imprimir true
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        loginDTO.getUsername(),
-                        loginDTO.getPassword()
-                )
-        );
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String token = jwtTokenProvider.generateToken(authentication);
-        return TokenResponse.builder()
-                .token(token)
-                .build();
+
+        try{
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            loginDTO.getUsername(),
+                            loginDTO.getPassword()
+                    )
+            );
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            String token = jwtTokenProvider.generateToken(authentication);
+            return TokenResponse.builder()
+                    .token(token)
+                    .build();
+
+
+
+        } catch (BadCredentialsException e){
+            throw new InvalidCredentialsException("Invalid username or password");
+        }
+
+
+
+
     }
 
     @Override
