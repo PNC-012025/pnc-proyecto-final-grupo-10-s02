@@ -3,6 +3,7 @@ package com.example.easybank.service.implementation;
 
 import com.example.easybank.domain.dto.response.*;
 import com.example.easybank.domain.mapper.*;
+import com.example.easybank.exception.ModelNotFoundException;
 import com.example.easybank.repository.AccountRepository;
 import com.example.easybank.repository.RoleRepository;
 import com.example.easybank.repository.TransactionRepository;
@@ -17,6 +18,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import org.springframework.data.domain.Pageable;
@@ -149,6 +151,11 @@ public class AdminServiceImpl implements AdminService {
     @Transactional
     public void depositToUserAccount(UUID userId, UUID accountId, BigDecimal amount, String description) {
 
+        String username =  SecurityContextHolder.getContext().getAuthentication().getName();
+
+        UserData admin = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ModelNotFoundException("User not found"));
+
         UserData user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
@@ -161,6 +168,7 @@ public class AdminServiceImpl implements AdminService {
 
         Transaction depositTx = Transaction.builder()
                 .originAccount(null)
+                .originAccount(admin.getAccounts().getFirst())
                 .destinationAccount(account)
                 .amount(amount)
                 .type("DEPOSIT")
