@@ -147,6 +147,8 @@ public class AdminServiceImpl implements AdminService {
                 .toList();
     }
 
+    // easter egg
+
     @Override
     @Transactional
     public void depositToUserAccount(UUID userId, UUID accountId, BigDecimal amount, String description) {
@@ -182,7 +184,7 @@ public class AdminServiceImpl implements AdminService {
         catch (DataAccessException e){
             throw new StorageException("Failed to save transaction");
         }
-        
+
         account.setBalance(account.getBalance().add(amount));
 
         try{
