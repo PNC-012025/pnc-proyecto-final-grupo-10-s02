@@ -16,7 +16,7 @@ Provee autenticación segura con JWT, control de usuarios y administración de t
   - Validación
 - 🐘 **PostgreSQL**
 - 🔐 **JWT** (Json Web Token)
-- 🐳 **Docker** y **Docker Compose**
+- 🐳 **Docker**
 - ☁️ **Railway** (hosting del backend)
 - ⚙️ **Lombok** (para evitar boilerplate)
 - 🧪 **JUnit** (para testing)
