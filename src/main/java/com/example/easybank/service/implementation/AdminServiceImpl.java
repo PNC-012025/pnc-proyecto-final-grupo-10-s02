@@ -182,8 +182,7 @@ public class AdminServiceImpl implements AdminService {
         catch (DataAccessException e){
             throw new StorageException("Failed to save transaction");
         }
-
-
+        
         account.setBalance(account.getBalance().add(amount));
 
         try{
@@ -193,14 +192,4 @@ public class AdminServiceImpl implements AdminService {
             throw new StorageException("Failed to update account");
         }
     }
-
-
-
-
-
-
-
-
-
-
 }
