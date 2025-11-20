@@ -9,6 +9,7 @@ import com.example.easybank.util.GenericResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,6 +23,7 @@ import static com.example.easybank.util.Constant.*;
 public class AdminController {
     private final AdminService adminService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping(USER_LIST)
     public ResponseEntity<GenericResponse> getAllUsers() throws Exception {
         List<UserResponseDTO> users = adminService.findAllUsers();
@@ -34,6 +36,7 @@ public class AdminController {
 
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping(USER_LIST + "/{id}")
     public ResponseEntity<GenericResponse> getUserById(@PathVariable("id")  UUID id) throws Exception {
         UserResponseDTO user = adminService.getUserById(id);
@@ -45,7 +48,7 @@ public class AdminController {
                 .build().buildResponse();
     }
 
-
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping(USER_LIST + DELETE + "/{id}")
     public ResponseEntity<GenericResponse> deleteUser(@PathVariable("id") UUID id) throws Exception {
         adminService.delete(id);
@@ -55,7 +58,7 @@ public class AdminController {
                 .build().buildResponse();
     }
 
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping(USER_LIST + CHANGE_ROLE + "/{id}")
     public ResponseEntity<GenericResponse> changeUserRoles(@PathVariable ("id") UUID id, @RequestBody ChangeRoleRequestDTO request) {
 
@@ -67,6 +70,7 @@ public class AdminController {
                 .build().buildResponse();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping(USER_LIST + "/{id}/accounts")
     public ResponseEntity<GenericResponse> getUserAccounts(@PathVariable ("id") UUID id) {
         List<AccountResponseAdminDTO> accounts = adminService.getUserAccounts(id);
@@ -77,6 +81,7 @@ public class AdminController {
                 .build().buildResponse();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping(USER_LIST + "/{id}/bills")
     public ResponseEntity<GenericResponse> getUserBills(@PathVariable ("id") UUID id) throws Exception {
         List<BillResponseDTO> bills = adminService.getUserBills(id);
@@ -87,6 +92,7 @@ public class AdminController {
                 .build().buildResponse();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping(TRANSACTION + "/{id}")
     public ResponseEntity<GenericResponse> getUserTransactions(
             @PathVariable ("id") UUID id,
@@ -102,7 +108,7 @@ public class AdminController {
                 .build().buildResponse();
     }
 
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(USER_LIST + "/{id}/deposit")
     public ResponseEntity<GenericResponse> depositToUserAccount(
             @PathVariable UUID id,
@@ -116,6 +122,8 @@ public class AdminController {
                 .build().buildResponse();
     }
 
+
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping(FIND_ALL)
     public ResponseEntity<GenericResponse> findAllTransactions() throws Exception {
         List<AdminTransactionResponseDTO> transactions = adminService.findAll();

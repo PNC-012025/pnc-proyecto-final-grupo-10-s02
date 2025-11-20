@@ -50,13 +50,12 @@ public class Security {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests((authorizeRequests) -> {
-                    authorizeRequests
-                            .requestMatchers(API + ADMIN + "/**").hasRole("ADMIN")
-                            .requestMatchers(API + AUTH + LOGIN).permitAll()
-                            .requestMatchers(API + AUTH + REGISTER).permitAll()
-                            .anyRequest().authenticated();
-                }).httpBasic(Customizer.withDefaults());
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(API + AUTH + LOGIN).permitAll()
+                        .requestMatchers(API + AUTH + REGISTER).permitAll()
+                        .anyRequest().authenticated()   // Let PreAuthorize handle the roles
+                )
+                .httpBasic(Customizer.withDefaults());
 
         http.exceptionHandling(exception ->
                 exception.authenticationEntryPoint(jwtAuth));

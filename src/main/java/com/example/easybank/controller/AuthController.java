@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import static com.example.easybank.util.Constant.*;
@@ -20,6 +21,7 @@ import static com.example.easybank.util.Constant.*;
 public class AuthController {
     private final AuthServiceImpl authService;
 
+    @PreAuthorize("hasRole('USER')")
     @PostMapping(REGISTER)
     public ResponseEntity<GenericResponse> register(@RequestBody @Valid RegisterDTO userToRegister) throws Exception {
         authService.register(userToRegister);
@@ -29,6 +31,7 @@ public class AuthController {
                 .build().buildResponse();
     }
 
+    @PreAuthorize("hasRole('USER')")
     @PostMapping(LOGIN)
     public ResponseEntity<GenericResponse> login(@RequestBody @Valid LoginDTO userToLogin) throws Exception {
         TokenResponse tokenResponse = authService.login(userToLogin);
@@ -39,6 +42,7 @@ public class AuthController {
                 .build().buildResponse();
     }
 
+    @PreAuthorize("hasRole('USER')")
     @GetMapping(WHO_AM_I)
     public ResponseEntity<GenericResponse> whoAmI() throws Exception {
         UserResponseDTO userData = authService.whoami();

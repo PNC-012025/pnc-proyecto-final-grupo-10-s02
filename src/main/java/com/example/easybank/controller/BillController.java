@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +22,7 @@ import static com.example.easybank.util.Constant.*;
 public class BillController {
     private final BillServiceImpl billService;
 
+    @PreAuthorize("hasRole('USER')")
     @PostMapping(CREATE)
     public ResponseEntity<GenericResponse> createBill(@RequestBody @Valid BillRequestDTO bill) throws Exception {
         billService.save(bill);
