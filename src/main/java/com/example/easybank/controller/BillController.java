@@ -34,6 +34,7 @@ public class BillController {
                 .buildResponse();
     }
 
+    @PreAuthorize("hasRole('USER')")
     @GetMapping(FIND_OWN)
     public ResponseEntity<GenericResponse> findOwnBill() throws Exception {
         List<BillResponseDTO> bills = billService.getAllMyBills();
@@ -45,6 +46,7 @@ public class BillController {
                 .build().buildResponse();
     }
 
+    @PreAuthorize("hasRole('USER')")
     @PatchMapping(PAY + "/{id}")
     public ResponseEntity<GenericResponse> payBill(@PathVariable("id") UUID id) throws Exception {
         billService.payBill(id);
@@ -54,6 +56,7 @@ public class BillController {
                 .build().buildResponse();
     }
 
+    @PreAuthorize("hasRole('USER')")
     @PatchMapping(EDIT)
     public ResponseEntity<GenericResponse> editBill(@RequestBody @Valid BillRequestDTO bill) throws Exception {
         billService.save(bill);
@@ -63,6 +66,7 @@ public class BillController {
                 .build().buildResponse();
     }
 
+    @PreAuthorize("hasRole('USER')")
     @DeleteMapping(DELETE + "/{id}")
     public ResponseEntity<GenericResponse> deleteBill(@PathVariable("id") UUID id) throws Exception {
         billService.delete(id);

@@ -21,7 +21,6 @@ import static com.example.easybank.util.Constant.*;
 public class AuthController {
     private final AuthServiceImpl authService;
 
-    @PreAuthorize("hasRole('USER')")
     @PostMapping(REGISTER)
     public ResponseEntity<GenericResponse> register(@RequestBody @Valid RegisterDTO userToRegister) throws Exception {
         authService.register(userToRegister);
@@ -31,7 +30,6 @@ public class AuthController {
                 .build().buildResponse();
     }
 
-    @PreAuthorize("hasRole('USER')")
     @PostMapping(LOGIN)
     public ResponseEntity<GenericResponse> login(@RequestBody @Valid LoginDTO userToLogin) throws Exception {
         TokenResponse tokenResponse = authService.login(userToLogin);
@@ -42,7 +40,7 @@ public class AuthController {
                 .build().buildResponse();
     }
 
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("isAuthenticated()")
     @GetMapping(WHO_AM_I)
     public ResponseEntity<GenericResponse> whoAmI() throws Exception {
         UserResponseDTO userData = authService.whoami();

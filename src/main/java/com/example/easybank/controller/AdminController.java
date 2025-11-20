@@ -23,8 +23,9 @@ import static com.example.easybank.util.Constant.*;
 public class AdminController {
     private final AdminService adminService;
 
-    @PreAuthorize("hasRole('ADMIN')")
+
     @GetMapping(USER_LIST)
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<GenericResponse> getAllUsers() throws Exception {
         List<UserResponseDTO> users = adminService.findAllUsers();
 
@@ -36,8 +37,8 @@ public class AdminController {
 
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping(USER_LIST + "/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<GenericResponse> getUserById(@PathVariable("id")  UUID id) throws Exception {
         UserResponseDTO user = adminService.getUserById(id);
 
