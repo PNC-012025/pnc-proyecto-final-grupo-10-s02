@@ -3,7 +3,7 @@ package com.example.easybank.service.implementation;
 
 import com.example.easybank.domain.dto.response.*;
 import com.example.easybank.domain.mapper.*;
-import com.example.easybank.exception.ModelNotFoundException;
+import com.example.easybank.exception.*;
 import com.example.easybank.repository.AccountRepository;
 import com.example.easybank.repository.RoleRepository;
 import com.example.easybank.repository.TransactionRepository;
@@ -11,7 +11,6 @@ import com.example.easybank.repository.UserRepository;
 import com.example.easybank.service.AdminService;
 import com.example.easybank.domain.entity.*;
 import jakarta.persistence.EntityNotFoundException;
-import com.example.easybank.exception.StorageException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
@@ -31,6 +30,10 @@ public class AdminServiceImpl implements AdminService {
     private final TransactionRepository transactionRepository;
     private final AccountRepository accountRepository;
 
+    private UserData getUserEntityById(UUID id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
+    }
 
     @Override
     public List<UserResponseDTO> findAllUsers() {
@@ -39,20 +42,18 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public void delete(UUID id) {
-        UserData user = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+        UserData user = getUserEntityById(id);
 
         userRepository.delete(user);
     }
 
     @Override
     public void changeRoles(UUID id, List<String> roles) {
-        UserData user = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+        UserData user = getUserEntityById(id);
 
         Set<Role> newRoles = roles.stream()
                 .map(roleName -> roleRepository.findByName(roleName)
-                        .orElseThrow(() -> new EntityNotFoundException("Role not found: " + roleName)))
+                        .orElseThrow(() -> new RoleNotFoundException("Role not found: " + roleName)))
                 .collect(Collectors.toSet());
 
         user.setRoles(newRoles);
@@ -68,24 +69,19 @@ public class AdminServiceImpl implements AdminService {
     }
 
 
-    @Transactional//(readOnly = true)
+
     public UserResponseDTO getUserById(UUID id) {
-        UserData user = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + id));
-
+        UserData user = getUserEntityById(id);
         UserResponseDTO dto = UserMapper.toDTO(user);
-        dto.setRoles(user.getRoles().stream()
-                .map(Role::getName)
-                .toList());
-
+        dto.setRoles(user.getRoles().stream().map(Role::getName).toList());
         return dto;
     }
+
 
     @Override
     @Transactional//(readOnly = true)
     public List<AccountResponseAdminDTO> getUserAccounts(UUID userId) {
-        UserData user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+        UserData user = getUserEntityById(userId);
 
         return user.getAccounts().stream()
                 .map(AccountMapper::toAdminDTO)
@@ -95,8 +91,7 @@ public class AdminServiceImpl implements AdminService {
     @Override
     @Transactional//(readOnly = true)
     public List<BillResponseDTO> getUserBills(UUID userId) {
-        UserData user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+        UserData user = getUserEntityById(userId);
 
         return user.getBills().stream()
                 .map(BillMapper::toDTO)
@@ -124,8 +119,7 @@ public class AdminServiceImpl implements AdminService {
         }
 
         // Check user exists
-        UserData user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+        UserData user = getUserEntityById(userId);
 
         // Fetch
         List<AdminTransactionResponseDTO> origin =
@@ -155,13 +149,12 @@ public class AdminServiceImpl implements AdminService {
         String username =  SecurityContextHolder.getContext().getAuthentication().getName();
 
         UserData admin = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ModelNotFoundException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found with name: " + username));
 
-        UserData user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+        UserData user = getUserEntityById(userId);
 
         Account account = accountRepository.findById(accountId)
-                .orElseThrow(() -> new EntityNotFoundException("Account not found"));
+                .orElseThrow(() -> new AccountNotFoundException("Account not found with ID: " + accountId));
 
         if (!account.getUser().getId().equals(userId)) {
             throw new IllegalArgumentException("Account does not belong to user");

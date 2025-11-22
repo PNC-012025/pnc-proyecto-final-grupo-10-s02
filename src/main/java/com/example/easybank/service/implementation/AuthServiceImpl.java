@@ -62,7 +62,7 @@ public class AuthServiceImpl implements AuthService {
 
         UserData user = UserMapper.toEntity(registerDTO);
 
-        Optional<Role> role = roleRepository.findByName("ROLE_USER");
+        Optional<Role> role = roleRepository.findByName("USER");
         Role userRole = role.orElseThrow(() -> new EntityNotFoundException("Role not found"));
         user.setRoles(Set.of(userRole));
 

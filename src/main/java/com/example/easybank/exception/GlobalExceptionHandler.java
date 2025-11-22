@@ -195,6 +195,95 @@ public class GlobalExceptionHandler {
     }
 
 
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<GenericResponse> handleUserNotFound(
+            UserNotFoundException ex,
+            WebRequest request
+    ) {
+        CustomErrorResponse error = new CustomErrorResponse(
+                LocalDate.now(),
+                ex.getMessage(),
+                request.getDescription(false)
+        );
+
+        return GenericResponse.builder()
+                .data(error)
+                .status(HttpStatus.NOT_FOUND)
+                .build()
+                .buildResponse();
+    }
+
+    @ExceptionHandler(AccountNotFoundException.class)
+    public ResponseEntity<GenericResponse> handleAccountNotFound(
+            AccountNotFoundException ex,
+            WebRequest request
+    ) {
+        CustomErrorResponse error = new CustomErrorResponse(
+                LocalDate.now(),
+                ex.getMessage(),
+                request.getDescription(false)
+        );
+
+        return GenericResponse.builder()
+                .data(error)
+                .status(HttpStatus.NOT_FOUND)
+                .build()
+                .buildResponse();
+    }
+
+    @ExceptionHandler(RoleNotFoundException.class)
+    public ResponseEntity<GenericResponse> handleRoleNotFound(
+            RoleNotFoundException ex,
+            WebRequest request
+    ) {
+        CustomErrorResponse error = new CustomErrorResponse(
+                LocalDate.now(),
+                ex.getMessage(),
+                request.getDescription(false)
+        );
+
+        return GenericResponse.builder()
+                .data(error)
+                .status(HttpStatus.NOT_FOUND)
+                .build()
+                .buildResponse();
+    }
+
+    @ExceptionHandler(TransactionNotFoundException.class)
+    public ResponseEntity<GenericResponse> handleTransactionNotFound(
+            TransactionNotFoundException ex,
+            WebRequest request
+    ) {
+        CustomErrorResponse error = new CustomErrorResponse(
+                LocalDate.now(),
+                ex.getMessage(),
+                request.getDescription(false)
+        );
+
+        return GenericResponse.builder()
+                .data(error)
+                .status(HttpStatus.NOT_FOUND)
+                .build()
+                .buildResponse();
+    }
+
+    @ExceptionHandler(BillNotFoundException.class)
+    public ResponseEntity<GenericResponse> handleBillNotFound(
+            BillNotFoundException ex,
+            WebRequest request
+    ) {
+        CustomErrorResponse error = new CustomErrorResponse(
+                LocalDate.now(),
+                ex.getMessage(),
+                request.getDescription(false)
+        );
+
+        return GenericResponse.builder()
+                .data(error)
+                .status(HttpStatus.NOT_FOUND)
+                .build()
+                .buildResponse();
+    }
 
 
 
