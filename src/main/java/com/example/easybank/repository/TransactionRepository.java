@@ -15,7 +15,10 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
 
     Optional<Transaction> findTransactionsByOriginAccount(Account originAccount);
 
-    List<Transaction> findByOriginAccount_User_Id(UUID userId);
-    List<Transaction> findByDestinationAccount_User_Id(UUID userId);
+    List<Transaction> findByOriginAccount_User_IdOrDestinationAccount_User_IdOrderByDateTimeDesc(
+            UUID originUserId,
+            UUID destinationUserId
+    );
+
 
 }

@@ -118,23 +118,18 @@ public class AdminServiceImpl implements AdminService {
             throw new IllegalArgumentException("Invalid UUID format: " + id);
         }
 
-        // Check user exists
-        UserData user = getUserEntityById(userId);
+        if (!userRepository.existsById(userId)) {
+            throw new UserNotFoundException("User not found with ID: " + userId);
+        }
 
-        // Fetch
-        List<AdminTransactionResponseDTO> origin =
-                transactionRepository.findByOriginAccount_User_Id(userId)
-                        .stream().map(AdminTransactionMapper::toDTO).toList();
+        List<Transaction> transactions =
+                transactionRepository.findByOriginAccount_User_IdOrDestinationAccount_User_IdOrderByDateTimeDesc(
+                        userId, userId
+                );
 
-        List<AdminTransactionResponseDTO> dest =
-                transactionRepository.findByDestinationAccount_User_Id(userId)
-                        .stream().map(AdminTransactionMapper::toDTO).toList();
-
-        List<AdminTransactionResponseDTO> finalList = new ArrayList<>();
-        finalList.addAll(origin);
-        finalList.addAll(dest);
-
-        return finalList;
+        return transactions.stream()
+                .map(AdminTransactionMapper::toDTO)
+                .toList();
     }
 
 
