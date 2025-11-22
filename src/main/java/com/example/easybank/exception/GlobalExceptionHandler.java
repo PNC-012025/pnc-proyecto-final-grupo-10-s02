@@ -285,6 +285,24 @@ public class GlobalExceptionHandler {
                 .buildResponse();
     }
 
+    @ExceptionHandler(InvalidUUIDException.class)
+    public ResponseEntity<GenericResponse> handleInvalidUUID(
+            InvalidUUIDException ex,
+            WebRequest request
+    ) {
+        CustomErrorResponse error = new CustomErrorResponse(
+                LocalDate.now(),
+                ex.getMessage(),
+                request.getDescription(false)
+        );
+
+        return GenericResponse.builder()
+                .data(error)
+                .status(HttpStatus.BAD_REQUEST)
+                .build()
+                .buildResponse();
+    }
+
 
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
