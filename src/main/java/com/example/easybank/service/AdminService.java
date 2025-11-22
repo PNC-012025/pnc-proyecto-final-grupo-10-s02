@@ -15,7 +15,7 @@ public interface AdminService {
     List<AccountResponseAdminDTO> getUserAccounts(UUID id);
     List<BillResponseDTO> getUserBills(UUID id);
     List<AdminTransactionResponseDTO> getUserTransactions(String userId);
-    void depositToUserAccount(UUID userId, UUID accountId, BigDecimal amount, String description);
+    void depositToUserAccount(UUID userId, UUID accountId, BigDecimal amount, String description, String performedByUsername);
     //public List<AdminTransactionResponseDTO> findAll() throws Exception;
 
 }

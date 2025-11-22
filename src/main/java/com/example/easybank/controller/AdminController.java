@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -98,9 +99,14 @@ public class AdminController {
     @PostMapping(USER_LIST + "/{id}/deposit")
     public ResponseEntity<GenericResponse> depositToUserAccount(
             @PathVariable UUID id,
-            @RequestBody DepositRequestDTO request) {
+            @RequestBody DepositRequestDTO request,
+            Authentication authentication) {
 
-        adminService.depositToUserAccount(id, request.getAccountId(), request.getAmount(), request.getDescription());
+        adminService.depositToUserAccount(id,
+                request.getAccountId(),
+                request.getAmount(),
+                request.getDescription(),
+                authentication.getName());
 
         return GenericResponse.builder()
                 .status(HttpStatus.OK)

@@ -131,12 +131,16 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     @Transactional
-    public void depositToUserAccount(UUID userId, UUID accountId, BigDecimal amount, String description) {
+    public void depositToUserAccount(UUID userId,
+                                     UUID accountId,
+                                     BigDecimal amount,
+                                     String description,
+                                     String performedByUsername) {
 
-        String username =  SecurityContextHolder.getContext().getAuthentication().getName();
+        //String username =  SecurityContextHolder.getContext().getAuthentication().getName();
 
-        UserData admin = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UserNotFoundException("Admin user not found with name: " + username));
+        UserData admin = userRepository.findByUsername(performedByUsername)
+                .orElseThrow(() -> new UserNotFoundException("Admin user not found with name: " + performedByUsername));
 
         UserData user = getUserEntityById(userId);
 
@@ -168,8 +172,6 @@ public class AdminServiceImpl implements AdminService {
 
 
         account.setBalance(account.getBalance().add(amount));
-
-
         accountRepository.save(account);
 
     }
