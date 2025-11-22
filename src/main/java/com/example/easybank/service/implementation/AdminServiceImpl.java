@@ -60,12 +60,8 @@ public class AdminServiceImpl implements AdminService {
         user.setRoles(newRoles);
 
 
-        try{
-            userRepository.save(user);
-        }
-        catch (DataAccessException e){
-            throw new StorageException("Failed to update user");
-        }
+        userRepository.save(user);
+
 
     }
 
@@ -167,19 +163,14 @@ public class AdminServiceImpl implements AdminService {
                 .dateTime(LocalDateTime.now())
                 .build();
 
-        try{
-            transactionRepository.save(depositTx);
-        }
-        catch (DataAccessException e){
-            throw new StorageException("Failed to save transaction");
-        }
+
+        transactionRepository.save(depositTx);
+
 
         account.setBalance(account.getBalance().add(amount));
 
-        try{
-            accountRepository.save(account);
-        }catch (DataAccessException e){
-            throw new StorageException("Failed to update account");
-        }
+
+        accountRepository.save(account);
+
     }
 }
