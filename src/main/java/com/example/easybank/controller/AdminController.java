@@ -93,21 +93,6 @@ public class AdminController {
                 .build().buildResponse();
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping(TRANSACTION + "/{id}")
-    public ResponseEntity<GenericResponse> getUserTransactions(
-            @PathVariable ("id") UUID id,
-            @RequestParam(defaultValue = "10") int limit,
-            @RequestParam(defaultValue = "0") int page) {
-
-        List<AdminTransactionResponseDTO> transactions = adminService.getUserTransactions(id, limit, page);
-
-        return GenericResponse.builder()
-                .data(transactions)
-                .message("User's transactions found")
-                .status(HttpStatus.OK)
-                .build().buildResponse();
-    }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(USER_LIST + "/{id}/deposit")
@@ -124,16 +109,22 @@ public class AdminController {
     }
 
 
+    @GetMapping(TRANSACTION)
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping(FIND_ALL)
-    public ResponseEntity<GenericResponse> findAllTransactions() throws Exception {
-        List<AdminTransactionResponseDTO> transactions = adminService.findAll();
+    public ResponseEntity<?> getTransactions(
+            @RequestParam(required = false) UUID id,
+            @RequestParam(defaultValue = "10") int limit,
+            @RequestParam(defaultValue = "0") int page
+    ) {
         return GenericResponse.builder()
+                .data(adminService.getUserTransactions(id, limit, page))
                 .status(HttpStatus.OK)
-                .message("All transactions found")
-                .data(transactions)
-                .build().buildResponse();
+                .message("Transactions retrieved")
+                .build()
+                .buildResponse();
     }
+
+
 }
 
 

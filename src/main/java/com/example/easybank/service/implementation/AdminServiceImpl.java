@@ -25,10 +25,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -111,32 +108,35 @@ public class AdminServiceImpl implements AdminService {
                 .toList();
     }
 
-    @Override
-    @Transactional//(readOnly = true)
     public List<AdminTransactionResponseDTO> getUserTransactions(UUID userId, int limit, int page) {
-
-        UserData user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
         Pageable pageable = PageRequest.of(page, limit, Sort.by("dateTime").descending());
 
-        Page<Transaction> pageResultOrigin = transactionRepository.findByOriginAccount_User(user, pageable);
-        Page<Transaction> pageResultDestination = transactionRepository.findByDestinationAccount_User(user, pageable);
+        if (userId == null) {
+            // return ALL transactions
+            return transactionRepository.findAll(pageable).stream()
+                    .map(UserTransactionMapper::toDTO)
+                    .toList();
+        }
 
-        List<AdminTransactionResponseDTO> transactionsOrigin = pageResultOrigin.getContent().stream()
+        // return one user's transactions
+        UserData user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+        Page<Transaction> origin = transactionRepository.findByOriginAccount_User(user, pageable);
+        Page<Transaction> destination = transactionRepository.findByDestinationAccount_User(user, pageable);
+
+        List<Transaction> all = new ArrayList<>();
+        all.addAll(origin.getContent());
+        all.addAll(destination.getContent());
+
+        all.sort(Comparator.comparing(Transaction::getDateTime).reversed());
+
+        return all.stream()
                 .map(UserTransactionMapper::toDTO)
                 .toList();
-
-        List<AdminTransactionResponseDTO> transactionsDestination = pageResultDestination.getContent().stream()
-                .map(UserTransactionMapper::toDTO)
-                .toList();
-
-        List<AdminTransactionResponseDTO> finalList = new ArrayList<>();
-        finalList.addAll(transactionsOrigin);
-        finalList.addAll(transactionsDestination);
-
-        return finalList;
     }
+
 
     @Override
     public List<AdminTransactionResponseDTO> findAll() throws Exception{
