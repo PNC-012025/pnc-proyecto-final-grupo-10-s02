@@ -15,13 +15,8 @@ import com.example.easybank.exception.StorageException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
-import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -112,11 +107,11 @@ public class AdminServiceImpl implements AdminService {
    // @Transactional(readOnly = true)
     public List<AdminTransactionResponseDTO> getUserTransactions(String id) {
 
-        // CASE 1 → No ID provided
+        //No ID provided
         if (id == null) {
             return transactionRepository.findAll()
                     .stream()
-                    .map(UserTransactionMapper::toDTO)
+                    .map(AdminTransactionMapper::toDTO)
                     .toList();
         }
 
@@ -128,18 +123,18 @@ public class AdminServiceImpl implements AdminService {
             throw new IllegalArgumentException("Invalid UUID format: " + id);
         }
 
-        // CASE 3 → Check user exists
+        // Check user exists
         UserData user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
         // Fetch
         List<AdminTransactionResponseDTO> origin =
                 transactionRepository.findByOriginAccount_User_Id(userId)
-                        .stream().map(UserTransactionMapper::toDTO).toList();
+                        .stream().map(AdminTransactionMapper::toDTO).toList();
 
         List<AdminTransactionResponseDTO> dest =
                 transactionRepository.findByDestinationAccount_User_Id(userId)
-                        .stream().map(UserTransactionMapper::toDTO).toList();
+                        .stream().map(AdminTransactionMapper::toDTO).toList();
 
         List<AdminTransactionResponseDTO> finalList = new ArrayList<>();
         finalList.addAll(origin);

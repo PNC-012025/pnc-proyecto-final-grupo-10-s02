@@ -24,18 +24,8 @@ public class CustomUserDetailService implements UserDetailsService {
         UserData user = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
                 .orElseThrow(() -> new UsernameNotFoundException(usernameOrEmail));
 
-        Set<GrantedAuthority> grantedAuthorities = user.getRoles()
-                .stream()
-                .map(role -> {
-                    String name = role.getName();
-                    
-                    if (!name.startsWith("ROLE_")) {
-                        name = "ROLE_" + name;
-                    }
-
-                    return new SimpleGrantedAuthority(name);
-                })
-                .collect(Collectors.toSet());
+        Set<GrantedAuthority> grantedAuthorities = user.getRoles() .stream() .map(role ->
+                new SimpleGrantedAuthority("ROLE_" + role.getName())) .collect(Collectors.toSet());
 
         return new User(user.getUsername(), user.getHashedPassword(), grantedAuthorities);
     }
