@@ -11,11 +11,11 @@ import com.example.easybank.repository.UserRepository;
 import com.example.easybank.service.AdminService;
 import com.example.easybank.domain.entity.*;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -36,6 +36,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<UserResponseDTO> findAllUsers() {
         return UserMapper.toDTOList(userRepository.findAll());
     }
@@ -68,8 +69,7 @@ public class AdminServiceImpl implements AdminService {
 
     }
 
-
-
+    @Transactional(readOnly = true)
     public UserResponseDTO getUserById(UUID id) {
         UserData user = getUserEntityById(id);
         UserResponseDTO dto = UserMapper.toDTO(user);
@@ -79,7 +79,7 @@ public class AdminServiceImpl implements AdminService {
 
 
     @Override
-    @Transactional//(readOnly = true)
+    @Transactional(readOnly = true)
     public List<AccountResponseAdminDTO> getUserAccounts(UUID userId) {
         UserData user = getUserEntityById(userId);
 
@@ -89,7 +89,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    @Transactional//(readOnly = true)
+    @Transactional(readOnly = true)
     public List<BillResponseDTO> getUserBills(UUID userId) {
         UserData user = getUserEntityById(userId);
 
@@ -99,7 +99,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-   // @Transactional(readOnly = true)
+    @Transactional(readOnly = true)
     public List<AdminTransactionResponseDTO> getUserTransactions(String id) {
 
         //No ID provided
@@ -137,10 +137,6 @@ public class AdminServiceImpl implements AdminService {
         return finalList;
     }
 
-
-
-
-    // easter egg
 
     @Override
     @Transactional
