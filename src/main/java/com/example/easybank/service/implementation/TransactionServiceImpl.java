@@ -2,7 +2,6 @@ package com.example.easybank.service.implementation;
 
 import com.example.easybank.domain.dto.request.TransactionRequestDTO;
 import com.example.easybank.domain.dto.response.TransactionResponseDTO;
-import com.example.easybank.domain.entity.Bill;
 import com.example.easybank.domain.mapper.TransactionMapper;
 import com.example.easybank.exception.*;
 import com.example.easybank.repository.BillRepository;
@@ -13,17 +12,19 @@ import com.example.easybank.domain.entity.UserData;
 import com.example.easybank.repository.AccountRepository;
 import com.example.easybank.repository.TransactionRepository;
 import com.example.easybank.repository.UserRepository;
+import com.example.easybank.util.TransactionSpecifications;
 import com.example.easybank.util.generator.RandomCreditCardGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -99,51 +100,24 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public List<TransactionResponseDTO> findMyOwnTransactions() {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        UserData user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ModelNotFoundException("User not found"));
+    public Page<TransactionResponseDTO> getAllTransactions(
+            String type,
+            LocalDateTime from,
+            LocalDateTime to,
+            UUID accountId,
+            UUID originAccountId,
+            UUID destinationAccountId,
+            Pageable pageable
+    ) throws Exception{
+        Specification<Transaction> spec = Specification
+                .allOf(
+                        TransactionSpecifications.hasAccount(accountId),
+                        TransactionSpecifications.hasType(type),
+                        TransactionSpecifications.hasOriginAccount(originAccountId),
+                        TransactionSpecifications.hasDestinationAccount(destinationAccountId),
+                        TransactionSpecifications.betweenDates(from, to)
+                );
 
-        Account account = user.getAccounts().getFirst();
-
-        List<TransactionResponseDTO> transactionResponseOriginDTOS = account
-                .getOriginTransactions().stream().map(transaction -> TransactionResponseDTO.builder()
-                        .id(transaction.getId())
-                        .name(account.getUser().getFirstName() + " " + account.getUser().getLastName())
-                        .accountNumber(account.getNumber())
-                        .amount(transaction.getAmount())
-                        .date(transaction.getDateTime())
-                        .description(transaction.getDescription())
-                        .type("SENDER")
-                        .build()).toList();
-
-        List<TransactionResponseDTO> transactionResponseDestinationDTOS = account
-                .getDestinationTransactions().stream().map(transaction -> TransactionResponseDTO.builder()
-                        .id(transaction.getId())
-                        .name(account.getUser().getFirstName() + " " + account.getUser().getLastName())
-                        .accountNumber(account.getNumber())
-                        .amount(transaction.getAmount())
-                        .description(transaction.getDescription())
-                        .date(transaction.getDateTime())
-                        .type("RECEIVER")
-                        .build()).toList();
-
-        List<TransactionResponseDTO> transactionBill = billRepository.
-                findBillsByStateAndUser("PAID", user).stream().map(bill -> TransactionResponseDTO.builder()
-                        .id(bill.getId())
-                        .name(bill.getUser().getFirstName() + " " + bill.getUser().getLastName())
-                        .accountNumber(bill.getUser().getAccounts().getFirst().getNumber())
-                        .amount(bill.getAmount())
-                        .description(bill.getName())
-                        .date(bill.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())
-                        .type("SENDER")
-                        .build()).toList();
-
-        List<TransactionResponseDTO> finalResponse = new ArrayList<>();
-        finalResponse.addAll(transactionResponseOriginDTOS);
-        finalResponse.addAll(transactionResponseDestinationDTOS);
-        finalResponse.addAll(transactionBill);
-
-        return finalResponse;
+        return transactionRepository.findAll(spec, pageable).map(TransactionMapper::toDTO);
     }
 }

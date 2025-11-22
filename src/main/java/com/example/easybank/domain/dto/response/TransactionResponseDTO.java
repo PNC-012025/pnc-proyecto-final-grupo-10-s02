@@ -17,7 +17,8 @@ public class TransactionResponseDTO {
     private UUID id;
     private BigDecimal amount;
     private String description;
-    private String accountNumber;
+    private String originAccountNumber;
+    private String destinationAccountNumber;
     private LocalDateTime date;
     private String type;
     private String name;

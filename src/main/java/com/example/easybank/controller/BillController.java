@@ -6,11 +6,12 @@ import com.example.easybank.service.implementation.BillServiceImpl;
 import com.example.easybank.util.GenericResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 import static com.example.easybank.util.Constant.*;
@@ -32,14 +33,26 @@ public class BillController {
                 .buildResponse();
     }
 
+//    @GetMapping(FIND_OWN)
+//    public ResponseEntity<GenericResponse> findOwnBill() throws Exception {
+//        List<BillResponseDTO> bills = billService.getAllMyBills();
+//        return GenericResponse
+//                .builder()
+//                .status(HttpStatus.OK)
+//                .message("Bills found")
+//                .data(bills)
+//                .build().buildResponse();
+//    }
+
     @GetMapping(FIND_OWN)
-    public ResponseEntity<GenericResponse> findOwnBill() throws Exception {
-        List<BillResponseDTO> bills = billService.getAllMyBills();
+    public ResponseEntity<GenericResponse> findOwnBill(Pageable pageable) throws Exception {
+        Page<BillResponseDTO> response = billService.getMyBillsPaged(pageable);
+
         return GenericResponse
                 .builder()
                 .status(HttpStatus.OK)
                 .message("Bills found")
-                .data(bills)
+                .data(response)
                 .build().buildResponse();
     }
 
