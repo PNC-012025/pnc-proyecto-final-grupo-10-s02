@@ -35,6 +35,17 @@ public class AdminServiceImpl implements AdminService {
                 .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
     }
 
+    private Role getRole(String name) {
+        return roleRepository.findByName(name)
+                .orElseThrow(() -> new EntityNotFoundException("Role not found: " + name));
+    }
+
+    private Account getAccountById(UUID id) {
+        return accountRepository.findById(id)
+                .orElseThrow(() -> new AccountNotFoundException("Account not found with ID: " + id));
+    }
+
+
     @Override
     @Transactional(readOnly = true)
     public List<UserResponseDTO> findAllUsers() {
@@ -50,11 +61,15 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public void changeRoles(UUID id, List<String> roles) {
+
         UserData user = getUserEntityById(id);
 
+        if (roles == null || roles.isEmpty()) {
+            throw new IllegalArgumentException("User must have at least one role");
+        }
+
         Set<Role> newRoles = roles.stream()
-                .map(roleName -> roleRepository.findByName(roleName)
-                        .orElseThrow(() -> new RoleNotFoundException("Role not found: " + roleName)))
+                .map(this::getRole)
                 .collect(Collectors.toSet());
 
         user.setRoles(newRoles);
@@ -137,15 +152,13 @@ public class AdminServiceImpl implements AdminService {
                                      String description,
                                      String performedByUsername) {
 
-        //String username =  SecurityContextHolder.getContext().getAuthentication().getName();
 
         UserData admin = userRepository.findByUsername(performedByUsername)
                 .orElseThrow(() -> new UserNotFoundException("Admin user not found with name: " + performedByUsername));
 
         UserData user = getUserEntityById(userId);
 
-        Account account = accountRepository.findById(accountId)
-                .orElseThrow(() -> new AccountNotFoundException("Account not found with ID: " + accountId));
+        Account account = getAccountById(accountId);
 
         if (!account.getUser().getId().equals(userId)) {
             throw new IllegalArgumentException("Account does not belong to user");
