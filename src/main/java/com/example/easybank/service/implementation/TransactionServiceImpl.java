@@ -2,7 +2,6 @@ package com.example.easybank.service.implementation;
 
 import com.example.easybank.domain.dto.request.TransactionRequestDTO;
 import com.example.easybank.domain.dto.response.TransactionResponseDTO;
-import com.example.easybank.domain.entity.Bill;
 import com.example.easybank.domain.mapper.TransactionMapper;
 import com.example.easybank.exception.*;
 import com.example.easybank.repository.BillRepository;

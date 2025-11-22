@@ -112,10 +112,6 @@ public class AuthServiceImpl implements AuthService {
         } catch (BadCredentialsException e){
             throw new InvalidCredentialsException("Invalid username or password");
         }
-
-
-
-
     }
 
     @Override
