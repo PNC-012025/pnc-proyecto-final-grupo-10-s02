@@ -145,7 +145,7 @@ public class AdminServiceImpl implements AdminService {
         String username =  SecurityContextHolder.getContext().getAuthentication().getName();
 
         UserData admin = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UserNotFoundException("User not found with name: " + username));
+                .orElseThrow(() -> new UserNotFoundException("Admin user not found with name: " + username));
 
         UserData user = getUserEntityById(userId);
 
@@ -156,9 +156,15 @@ public class AdminServiceImpl implements AdminService {
             throw new IllegalArgumentException("Account does not belong to user");
         }
 
+        if (admin.getAccounts().isEmpty()) {
+            throw new IllegalArgumentException("Admin does not have an account to use as origin");
+        }
+
+        Account adminAccount = admin.getAccounts().getFirst();
+
+
         Transaction depositTx = Transaction.builder()
-                .originAccount(null)
-                .originAccount(admin.getAccounts().getFirst())
+                .originAccount(adminAccount)
                 .destinationAccount(account)
                 .amount(amount)
                 .type("DEPOSIT")
@@ -177,8 +183,7 @@ public class AdminServiceImpl implements AdminService {
 
         try{
             accountRepository.save(account);
-        }
-        catch (DataAccessException e){
+        }catch (DataAccessException e){
             throw new StorageException("Failed to update account");
         }
     }
