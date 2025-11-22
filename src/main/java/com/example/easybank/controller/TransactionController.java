@@ -48,9 +48,9 @@ public class TransactionController {
         @RequestParam(required = false) String type,
         @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
         @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to,
-        @RequestParam(required = false) UUID accountId,
-        @RequestParam(required = false) UUID originTransactionId,
-        @RequestParam(required = false) UUID destinationTransactionId,
+        @RequestParam(required = false) String accountId,
+        @RequestParam(required = false) String originTransactionId,
+        @RequestParam(required = false) String destinationTransactionId,
         Pageable pageable
     ) throws Exception {
         Page<TransactionResponseDTO> response = transactionService.getAllTransactions(

@@ -20,21 +20,21 @@ public class TransactionSpecifications {
         };
     }
 
-    public static Specification<Transaction> hasOriginAccount(UUID originAccount) {
+    public static Specification<Transaction> hasOriginAccount(String originAccount) {
         return (root, query, criteriaBuilder) -> {
             if (originAccount == null) return null;
             return criteriaBuilder.equal(root.get("originAccount"), originAccount);
         };
     }
 
-    public static Specification<Transaction> hasDestinationAccount(UUID destinationAccount) {
+    public static Specification<Transaction> hasDestinationAccount(String destinationAccount) {
         return (root, query, criteriaBuilder) -> {
             if (destinationAccount == null) return null;
             return criteriaBuilder.equal(root.get("destinationAccount"), destinationAccount);
         };
     }
 
-    public static Specification<Transaction> hasAccount(UUID accountId) {
+    public static Specification<Transaction> hasAccount(String accountId) {
         return (root, query, criteriaBuilder) -> {
             if (accountId == null) return null;
             return criteriaBuilder.or(

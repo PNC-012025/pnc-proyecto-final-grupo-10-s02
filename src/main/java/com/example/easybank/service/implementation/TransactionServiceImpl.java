@@ -104,9 +104,9 @@ public class TransactionServiceImpl implements TransactionService {
             String type,
             LocalDateTime from,
             LocalDateTime to,
-            UUID accountId,
-            UUID originAccountId,
-            UUID destinationAccountId,
+            String accountId,
+            String originAccountId,
+            String destinationAccountId,
             Pageable pageable
     ) throws Exception{
         Specification<Transaction> spec = Specification
