@@ -108,44 +108,48 @@ public class AdminServiceImpl implements AdminService {
                 .toList();
     }
 
-    public List<AdminTransactionResponseDTO> getUserTransactions(UUID userId, int limit, int page) {
+    @Override
+   // @Transactional(readOnly = true)
+    public List<AdminTransactionResponseDTO> getUserTransactions(String id) {
 
-        Pageable pageable = PageRequest.of(page, limit, Sort.by("dateTime").descending());
-
-        if (userId == null) {
-            // return ALL transactions
-            return transactionRepository.findAll(pageable).stream()
+        // CASE 1 → No ID provided
+        if (id == null) {
+            return transactionRepository.findAll()
+                    .stream()
                     .map(UserTransactionMapper::toDTO)
                     .toList();
         }
 
-        // return one user's transactions
+        // CASE 2 → Validate UUID
+        UUID userId;
+        try {
+            userId = UUID.fromString(id);
+        } catch (IllegalArgumentException ex) {
+            throw new IllegalArgumentException("Invalid UUID format: " + id);
+        }
+
+        // CASE 3 → Check user exists
         UserData user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
-        Page<Transaction> origin = transactionRepository.findByOriginAccount_User(user, pageable);
-        Page<Transaction> destination = transactionRepository.findByDestinationAccount_User(user, pageable);
+        // Fetch
+        List<AdminTransactionResponseDTO> origin =
+                transactionRepository.findByOriginAccount_User_Id(userId)
+                        .stream().map(UserTransactionMapper::toDTO).toList();
 
-        List<Transaction> all = new ArrayList<>();
-        all.addAll(origin.getContent());
-        all.addAll(destination.getContent());
+        List<AdminTransactionResponseDTO> dest =
+                transactionRepository.findByDestinationAccount_User_Id(userId)
+                        .stream().map(UserTransactionMapper::toDTO).toList();
 
-        all.sort(Comparator.comparing(Transaction::getDateTime).reversed());
+        List<AdminTransactionResponseDTO> finalList = new ArrayList<>();
+        finalList.addAll(origin);
+        finalList.addAll(dest);
 
-        return all.stream()
-                .map(UserTransactionMapper::toDTO)
-                .toList();
+        return finalList;
     }
 
 
-    @Override
-    public List<AdminTransactionResponseDTO> findAll() throws Exception{
-        List<Transaction> transactions = transactionRepository.findAll();
 
-        return transactions.stream()
-                .map(UserTransactionMapper::toDTO)
-                .toList();
-    }
 
     // easter egg
 

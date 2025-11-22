@@ -111,18 +111,19 @@ public class AdminController {
 
     @GetMapping(TRANSACTION)
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> getTransactions(
-            @RequestParam(required = false) UUID id,
-            @RequestParam(defaultValue = "10") int limit,
-            @RequestParam(defaultValue = "0") int page
+    public ResponseEntity<GenericResponse> getTransactions(
+            @RequestParam(required = false) String id
     ) {
+        List<AdminTransactionResponseDTO> transactions = adminService.getUserTransactions(id);
+
         return GenericResponse.builder()
-                .data(adminService.getUserTransactions(id, limit, page))
+                .data(transactions)
                 .status(HttpStatus.OK)
                 .message("Transactions retrieved")
                 .build()
                 .buildResponse();
     }
+
 
 
 }
