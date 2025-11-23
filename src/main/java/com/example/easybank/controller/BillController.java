@@ -2,6 +2,7 @@ package com.example.easybank.controller;
 
 import com.example.easybank.domain.dto.request.BillRequestDTO;
 import com.example.easybank.domain.dto.response.BillResponseDTO;
+import com.example.easybank.domain.dto.response.PageResponse;
 import com.example.easybank.service.implementation.BillServiceImpl;
 import com.example.easybank.util.GenericResponse;
 import jakarta.validation.Valid;
@@ -33,26 +34,21 @@ public class BillController {
                 .buildResponse();
     }
 
-//    @GetMapping(FIND_OWN)
-//    public ResponseEntity<GenericResponse> findOwnBill() throws Exception {
-//        List<BillResponseDTO> bills = billService.getAllMyBills();
-//        return GenericResponse
-//                .builder()
-//                .status(HttpStatus.OK)
-//                .message("Bills found")
-//                .data(bills)
-//                .build().buildResponse();
-//    }
-
-    @GetMapping(FIND_OWN)
+    @GetMapping(FIND)
     public ResponseEntity<GenericResponse> findOwnBill(Pageable pageable) throws Exception {
-        Page<BillResponseDTO> response = billService.getMyBillsPaged(pageable);
+        PageResponse<BillResponseDTO> response = billService.getMyBillsPaged(pageable);
 
         return GenericResponse
                 .builder()
                 .status(HttpStatus.OK)
                 .message("Bills found")
-                .data(response)
+                .data(response.getContent())
+                .pageNumber(response.getPageNumber())
+                .pageSize(response.getPageSize())
+                .first(response.isFirst())
+                .last(response.isLast())
+                .totalElements(response.getTotalElements())
+                .totalPages(response.getTotalPages())
                 .build().buildResponse();
     }
 

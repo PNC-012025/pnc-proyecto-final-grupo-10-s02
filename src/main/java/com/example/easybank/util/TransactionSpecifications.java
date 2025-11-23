@@ -3,9 +3,7 @@ package com.example.easybank.util;
 import com.example.easybank.domain.entity.Transaction;
 import org.springframework.data.jpa.domain.Specification;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 public class TransactionSpecifications {
     public static Specification<Transaction> hasType(String type) {
@@ -15,22 +13,17 @@ public class TransactionSpecifications {
 
     public static Specification<Transaction> betweenDates(LocalDateTime from, LocalDateTime to) {
         return (root, query, criteriaBuilder) -> {
-            if (from != null || to != null) return null;
-            return criteriaBuilder.between(root.get("dateTime"), from, to);
-        };
-    }
+            if (from == null && to == null) return null;
 
-    public static Specification<Transaction> hasOriginAccount(String originAccount) {
-        return (root, query, criteriaBuilder) -> {
-            if (originAccount == null) return null;
-            return criteriaBuilder.equal(root.get("originAccount"), originAccount);
-        };
-    }
+            if (from != null && to != null) {
+                return criteriaBuilder.between(root.get("dateTime"), from, to);
+            }
 
-    public static Specification<Transaction> hasDestinationAccount(String destinationAccount) {
-        return (root, query, criteriaBuilder) -> {
-            if (destinationAccount == null) return null;
-            return criteriaBuilder.equal(root.get("destinationAccount"), destinationAccount);
+            if (from != null) {
+                return criteriaBuilder.greaterThanOrEqualTo(root.get("dateTime"), from);
+            }
+
+            return criteriaBuilder.lessThanOrEqualTo(root.get("dateTime"), to);
         };
     }
 
@@ -38,8 +31,8 @@ public class TransactionSpecifications {
         return (root, query, criteriaBuilder) -> {
             if (accountId == null) return null;
             return criteriaBuilder.or(
-                    criteriaBuilder.equal(root.get("originAccount").get("id"), accountId),
-                    criteriaBuilder.equal(root.get("destinationAccount").get("id"), accountId)
+                    criteriaBuilder.equal(root.get("originAccount").get("number"), accountId),
+                    criteriaBuilder.equal(root.get("destinationAccount").get("number"), accountId)
             );
         };
     }

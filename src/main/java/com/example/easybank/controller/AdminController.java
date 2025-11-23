@@ -7,8 +7,11 @@ import com.example.easybank.domain.dto.response.*;
 import com.example.easybank.service.AdminService;
 import com.example.easybank.util.GenericResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,18 +26,26 @@ public class AdminController {
     private final AdminService adminService;
 
     @GetMapping(USER_LIST)
-    public ResponseEntity<GenericResponse> getAllUsers() throws Exception {
-        List<UserResponseDTO> users = adminService.findAllUsers();
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<GenericResponse> getAllUsers(Pageable pageable) throws Exception {
+        PageResponse<UserResponseDTO> page = adminService.findAllUsers(pageable);
 
         return GenericResponse.builder()
-                .data(users)
+                .data(page.getContent())
                 .message("Users found")
                 .status(HttpStatus.OK)
+                .pageNumber(page.getPageNumber())
+                .pageSize(page.getPageSize())
+                .first(page.isFirst())
+                .last(page.isLast())
+                .totalElements(page.getTotalElements())
+                .totalPages(page.getTotalPages())
                 .build().buildResponse();
 
     }
 
     @GetMapping(USER_LIST + "/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<GenericResponse> getUserById(@PathVariable("id")  UUID id) throws Exception {
         UserResponseDTO user = adminService.getUserById(id);
 
@@ -47,6 +58,7 @@ public class AdminController {
 
 
     @DeleteMapping(USER_LIST + DELETE + "/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<GenericResponse> deleteUser(@PathVariable("id") UUID id) throws Exception {
         adminService.delete(id);
         return GenericResponse.builder()
@@ -57,6 +69,7 @@ public class AdminController {
 
 
     @PutMapping(USER_LIST + CHANGE_ROLE + "/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<GenericResponse> changeUserRoles(@PathVariable ("id") UUID id, @RequestBody ChangeRoleRequestDTO request) {
 
         adminService.changeRoles(id, request.getRoles());
@@ -68,6 +81,7 @@ public class AdminController {
     }
 
     @GetMapping(USER_LIST + "/{id}/accounts")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<GenericResponse> getUserAccounts(@PathVariable ("id") UUID id) {
         List<AccountResponseAdminDTO> accounts = adminService.getUserAccounts(id);
         return GenericResponse.builder()
@@ -78,32 +92,50 @@ public class AdminController {
     }
 
     @GetMapping(USER_LIST + "/{id}/bills")
-    public ResponseEntity<GenericResponse> getUserBills(@PathVariable ("id") UUID id) throws Exception {
-        List<BillResponseDTO> bills = adminService.getUserBills(id);
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<GenericResponse> getUserBills(
+            @PathVariable ("id") UUID id,
+            Pageable pageable
+    ) throws Exception {
+        PageResponse<BillResponseDTO> page = adminService.getUserBills(id, pageable);
         return GenericResponse.builder()
-                .data(bills)
+                .data(page.getContent())
                 .message("User's bills found")
                 .status(HttpStatus.OK)
+                .pageNumber(page.getPageNumber())
+                .pageSize(page.getPageSize())
+                .first(page.isFirst())
+                .last(page.isLast())
+                .totalElements(page.getTotalElements())
+                .totalPages(page.getTotalPages())
                 .build().buildResponse();
     }
 
     @GetMapping(TRANSACTION + "/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<GenericResponse> getUserTransactions(
             @PathVariable ("id") UUID id,
-            @RequestParam(defaultValue = "10") int limit,
-            @RequestParam(defaultValue = "0") int page) {
+            Pageable pageable
+    ) throws Exception {
 
-        List<AdminTransactionResponseDTO> transactions = adminService.getUserTransactions(id, limit, page);
+        PageResponse<AdminTransactionResponseDTO> page = adminService.getUserTransactions(id, pageable);
 
         return GenericResponse.builder()
-                .data(transactions)
+                .data(page.getContent())
                 .message("User's transactions found")
                 .status(HttpStatus.OK)
+                .pageNumber(page.getPageNumber())
+                .pageSize(page.getPageSize())
+                .first(page.isFirst())
+                .last(page.isLast())
+                .totalElements(page.getTotalElements())
+                .totalPages(page.getTotalPages())
                 .build().buildResponse();
     }
 
 
     @PostMapping(USER_LIST + "/{id}/deposit")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<GenericResponse> depositToUserAccount(
             @PathVariable UUID id,
             @RequestBody DepositRequestDTO request) {
@@ -116,13 +148,21 @@ public class AdminController {
                 .build().buildResponse();
     }
 
-    @GetMapping(FIND_ALL)
-    public ResponseEntity<GenericResponse> findAllTransactions() throws Exception {
-        List<AdminTransactionResponseDTO> transactions = adminService.findAll();
+    @GetMapping(TRANSACTION)
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<GenericResponse> findAllTransactions(Pageable pageable) throws Exception {
+        PageResponse<AdminTransactionResponseDTO> page = adminService.findAll(pageable);
+
         return GenericResponse.builder()
                 .status(HttpStatus.OK)
                 .message("All transactions found")
-                .data(transactions)
+                .data(page.getContent())
+                .pageNumber(page.getPageNumber())
+                .pageSize(page.getPageSize())
+                .first(page.isFirst())
+                .last(page.isLast())
+                .totalElements(page.getTotalElements())
+                .totalPages(page.getTotalPages())
                 .build().buildResponse();
     }
 }

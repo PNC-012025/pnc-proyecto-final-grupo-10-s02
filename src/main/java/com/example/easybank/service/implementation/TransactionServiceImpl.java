@@ -1,7 +1,9 @@
 package com.example.easybank.service.implementation;
 
 import com.example.easybank.domain.dto.request.TransactionRequestDTO;
+import com.example.easybank.domain.dto.response.PageResponse;
 import com.example.easybank.domain.dto.response.TransactionResponseDTO;
+import com.example.easybank.domain.mapper.PageMapper;
 import com.example.easybank.domain.mapper.TransactionMapper;
 import com.example.easybank.exception.*;
 import com.example.easybank.repository.BillRepository;
@@ -100,24 +102,27 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public Page<TransactionResponseDTO> getAllTransactions(
-            String type,
-            LocalDateTime from,
-            LocalDateTime to,
-            String accountId,
-            String originAccountId,
-            String destinationAccountId,
-            Pageable pageable
+    public PageResponse<TransactionResponseDTO> getAllTransactions(
+        String type,
+        LocalDateTime from,
+        LocalDateTime to,
+        Pageable pageable
     ) throws Exception{
-        Specification<Transaction> spec = Specification
-                .allOf(
-                        TransactionSpecifications.hasAccount(accountId),
-                        TransactionSpecifications.hasType(type),
-                        TransactionSpecifications.hasOriginAccount(originAccountId),
-                        TransactionSpecifications.hasDestinationAccount(destinationAccountId),
-                        TransactionSpecifications.betweenDates(from, to)
-                );
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        UserData user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ModelNotFoundException("User not found"));
+        String accountNumber = user.getAccounts().getFirst().getNumber();
 
-        return transactionRepository.findAll(spec, pageable).map(TransactionMapper::toDTO);
+        Specification<Transaction> spec = Specification
+            .allOf(
+                TransactionSpecifications.hasType(type),
+                TransactionSpecifications.betweenDates(from, to),
+                TransactionSpecifications.hasAccount(accountNumber)
+            );
+
+        Page<TransactionResponseDTO> transactionsPage =
+                transactionRepository.findAll(spec, pageable).map(TransactionMapper::toDTO);
+
+        return PageMapper.map(transactionsPage);
     }
 }

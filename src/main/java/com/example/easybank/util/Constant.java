@@ -20,6 +20,7 @@ public class Constant {
     public static final String FIND_OWN = "/findown";
     public static final String PAY = "/pay";
     public static final String FIND_ALL = "/findall";
+    public static final String FIND = "/find";
 
     public static final String CREATE = "/create";
     public static final String FIND_BY_ID = "/findbyid";

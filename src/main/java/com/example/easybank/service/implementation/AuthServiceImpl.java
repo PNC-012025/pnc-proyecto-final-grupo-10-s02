@@ -53,11 +53,13 @@ public class AuthServiceImpl implements AuthService {
                     throw new AlreadyExistsException("User already exists");
                 });
 
-        // Verificar si
+        // Verificar si el email ya exisste en la base de datos
         userRepository.findByEmail(registerDTO.getEmail())
                 .ifPresent(user -> {
                     throw new AlreadyExistsException("User already exists");
                 });
+
+        // Verificar si el DUi ya existe en la base de datos
         userRepository.findByDui(registerDTO.getDui())
                 .ifPresent(user -> {
                     throw new AlreadyExistsException("User already exists");
@@ -98,7 +100,9 @@ public class AuthServiceImpl implements AuthService {
                     )
             );
             SecurityContextHolder.getContext().setAuthentication(authentication);
+
             String token = jwtTokenProvider.generateToken(authentication);
+
             return TokenResponse.builder()
                     .token(token)
                     .build();
@@ -106,9 +110,6 @@ public class AuthServiceImpl implements AuthService {
         } catch (BadCredentialsException e){
             throw new InvalidCredentialsException("Invalid username or password");
         }
-
-
-
 
     }
 

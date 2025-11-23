@@ -34,7 +34,7 @@ public class Security {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("https://easy-bank-b642.vercel.app"));
+        config.setAllowedOrigins(List.of("http://localhost:5173"));
         config.setAllowedMethods(List.of("GET", "POST", "PATCH","PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
@@ -50,13 +50,12 @@ public class Security {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests((authorizeRequests) -> {
-                    authorizeRequests
-                            .requestMatchers(API + ADMIN + "/**").hasRole("ADMIN")
-                            .requestMatchers(API + AUTH + LOGIN).permitAll()
-                            .requestMatchers(API + AUTH + REGISTER).permitAll()
-                            .anyRequest().authenticated();
-                }).httpBasic(Customizer.withDefaults());
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(API + AUTH + LOGIN).permitAll()
+                        .requestMatchers(API + AUTH + REGISTER).permitAll()
+                        .anyRequest().authenticated()   // Let PreAuthorize handle the roles
+                )
+                .httpBasic(Customizer.withDefaults());
 
         http.exceptionHandling(exception ->
                 exception.authenticationEntryPoint(jwtAuth));

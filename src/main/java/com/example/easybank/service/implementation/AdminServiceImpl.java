@@ -4,12 +4,11 @@ package com.example.easybank.service.implementation;
 import com.example.easybank.domain.dto.response.*;
 import com.example.easybank.domain.mapper.*;
 import com.example.easybank.exception.ModelNotFoundException;
-import com.example.easybank.repository.AccountRepository;
-import com.example.easybank.repository.RoleRepository;
-import com.example.easybank.repository.TransactionRepository;
-import com.example.easybank.repository.UserRepository;
+import com.example.easybank.repository.*;
 import com.example.easybank.service.AdminService;
 import com.example.easybank.domain.entity.*;
+import com.example.easybank.util.BillSpecifications;
+import com.example.easybank.util.TransactionSpecifications;
 import jakarta.persistence.EntityNotFoundException;
 import com.example.easybank.exception.StorageException;
 import jakarta.transaction.Transactional;
@@ -18,6 +17,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -38,11 +38,15 @@ public class AdminServiceImpl implements AdminService {
     private final RoleRepository roleRepository;
     private final TransactionRepository transactionRepository;
     private final AccountRepository accountRepository;
+    private final BillRepository billRepository;
 
 
     @Override
-    public List<UserResponseDTO> findAllUsers() {
-        return UserMapper.toDTOList(userRepository.findAll());
+    public PageResponse<UserResponseDTO> findAllUsers(Pageable pageable) {
+
+        Page<UserResponseDTO> users = userRepository.findAll(pageable).map(UserMapper::toDTO);
+
+        return PageMapper.map(users);
     }
 
     @Override
@@ -102,49 +106,37 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     @Transactional//(readOnly = true)
-    public List<BillResponseDTO> getUserBills(UUID userId) {
+    public PageResponse<BillResponseDTO> getUserBills(UUID userId, Pageable pageable) {
         UserData user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
-        return user.getBills().stream()
-                .map(BillMapper::toDTO)
-                .toList();
+        Page<BillResponseDTO> bills = billRepository.getBillsByUser(user, pageable).map(BillMapper::toDTO);
+
+        return PageMapper.map(bills);
     }
 
     @Override
     @Transactional//(readOnly = true)
-    public List<AdminTransactionResponseDTO> getUserTransactions(UUID userId, int limit, int page) {
+    public PageResponse<AdminTransactionResponseDTO> getUserTransactions(UUID userId, Pageable pageable) {
 
         UserData user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
-        Pageable pageable = PageRequest.of(page, limit, Sort.by("dateTime").descending());
+        Specification<Transaction> spec = Specification.allOf(
+                TransactionSpecifications.hasAccount(user.getAccounts().getFirst().getNumber())
+        );
 
-        Page<Transaction> pageResultOrigin = transactionRepository.findByOriginAccount_User(user, pageable);
-        Page<Transaction> pageResultDestination = transactionRepository.findByDestinationAccount_User(user, pageable);
+        Page<AdminTransactionResponseDTO> transactions =
+            transactionRepository.findAll(spec, pageable).map(UserTransactionMapper::toDTO);
 
-        List<AdminTransactionResponseDTO> transactionsOrigin = pageResultOrigin.getContent().stream()
-                .map(UserTransactionMapper::toDTO)
-                .toList();
-
-        List<AdminTransactionResponseDTO> transactionsDestination = pageResultDestination.getContent().stream()
-                .map(UserTransactionMapper::toDTO)
-                .toList();
-
-        List<AdminTransactionResponseDTO> finalList = new ArrayList<>();
-        finalList.addAll(transactionsOrigin);
-        finalList.addAll(transactionsDestination);
-
-        return finalList;
+        return PageMapper.map(transactions);
     }
 
     @Override
-    public List<AdminTransactionResponseDTO> findAll() throws Exception{
-        List<Transaction> transactions = transactionRepository.findAll();
+    public PageResponse<AdminTransactionResponseDTO> findAll(Pageable pageable) throws Exception{
+        Page<AdminTransactionResponseDTO> transactions = transactionRepository.findAll(pageable).map(UserTransactionMapper::toDTO);
 
-        return transactions.stream()
-                .map(UserTransactionMapper::toDTO)
-                .toList();
+        return PageMapper.map(transactions);
     }
 
     // easter egg

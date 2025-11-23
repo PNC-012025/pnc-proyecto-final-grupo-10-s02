@@ -1,6 +1,7 @@
 package com.example.easybank.service;
 
 import com.example.easybank.domain.dto.request.TransactionRequestDTO;
+import com.example.easybank.domain.dto.response.PageResponse;
 import com.example.easybank.domain.dto.response.TransactionResponseDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,13 +12,10 @@ import java.util.UUID;
 
 public interface TransactionService {
     public void createTransaction(TransactionRequestDTO transactionRequestDTO) throws Exception;
-    public Page<TransactionResponseDTO> getAllTransactions(
+    public PageResponse<TransactionResponseDTO> getAllTransactions(
             String type,
             LocalDateTime from,
             LocalDateTime to,
-            String accountId,
-            String originAccountId,
-            String destinationAccountId,
             Pageable pageable
     ) throws Exception;
 }

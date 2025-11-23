@@ -14,6 +14,24 @@ public class GenericResponse {
     private String message;
     private Object data;
 
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+    private int pageNumber;
+
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+    private int pageSize;
+
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+    private long totalElements;
+
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+    private int totalPages;
+
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+    private boolean first;
+
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+    private boolean last;
+
     @Builder.Default
     @JsonIgnore
     private HttpStatus status = HttpStatus.OK;
@@ -22,3 +40,4 @@ public class GenericResponse {
         return ResponseEntity.status(status).body(this);
     }
 }
+

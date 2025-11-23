@@ -21,5 +21,4 @@ public class TransactionResponseDTO {
     private String destinationAccountNumber;
     private LocalDateTime date;
     private String type;
-    private String name;
 }
