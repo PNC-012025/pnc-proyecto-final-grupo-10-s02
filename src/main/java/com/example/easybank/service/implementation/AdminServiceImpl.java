@@ -10,6 +10,7 @@ import com.example.easybank.repository.TransactionRepository;
 import com.example.easybank.repository.UserRepository;
 import com.example.easybank.service.AdminService;
 import com.example.easybank.domain.entity.*;
+import com.example.easybank.util.RoleName;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -60,32 +61,22 @@ public class AdminServiceImpl implements AdminService {
 
 
     @Override
-    public void changeRoles(UUID id, List<String> roles) {
+    public void changeRoles(UUID id, List<RoleName> roles) {
 
         UserData user = getUserEntityById(id);
 
-        // validar lista de roles
-        if (roles == null) {
-            throw new IllegalArgumentException("Roles list cannot be null");
+        if (roles == null || roles.isEmpty()) {
+            throw new IllegalArgumentException("User must have at least one role");
         }
 
         Set<Role> newRoles = roles.stream()
-                .map(role -> {
-                    String cleaned = role == null ? "" : role.trim(); // trim blank spaces
-                    if (cleaned.isEmpty()) {
-                        throw new IllegalArgumentException("Role name cannot be blank");
-                    }
-                    return getRole(cleaned);
-                })
+                .map(roleEnum -> getRole(roleEnum.name()))
                 .collect(Collectors.toSet());
-
-        if (newRoles.isEmpty()) {
-            throw new IllegalArgumentException("User must have at least one role");
-        }
 
         user.setRoles(newRoles);
         userRepository.save(user);
     }
+
 
 
     @Transactional(readOnly = true)

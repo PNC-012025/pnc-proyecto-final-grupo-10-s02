@@ -3,6 +3,7 @@ package com.example.easybank.exception;
 import com.example.easybank.util.GenericResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -315,6 +316,19 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.BAD_REQUEST)
                 .message("Validation failed")
                 .build().buildResponse();
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<GenericResponse> handleJsonParseError(HttpMessageNotReadableException ex) {
+
+        String message = "Invalid request format: " + ex.getMostSpecificCause().getMessage();
+
+        GenericResponse response = GenericResponse.builder()
+                .message(message)
+                .status(HttpStatus.BAD_REQUEST)
+                .build();
+
+        return response.buildResponse();
     }
 
 }
