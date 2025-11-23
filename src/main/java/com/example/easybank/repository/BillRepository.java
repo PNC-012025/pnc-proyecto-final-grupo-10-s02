@@ -9,6 +9,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface BillRepository extends JpaRepository<Bill, UUID> {
-    public List<Bill> getBillsById(UUID id);
-    public List<Bill> findBillsByStateAndUser(String state, UserData user);
+    List<Bill> getBillsById(UUID id);
+    List<Bill> findBillsByStateAndUser(String state, UserData user);
 }
