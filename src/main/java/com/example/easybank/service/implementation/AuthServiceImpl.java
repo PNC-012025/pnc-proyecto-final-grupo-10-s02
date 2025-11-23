@@ -45,19 +45,19 @@ public class AuthServiceImpl implements AuthService {
     public void register(RegisterDTO registerDTO) throws Exception {
 
         // Verificar si el nombre de usuario ya esta tomado
-        userRepository.findByUsername(registerDTO.getUsername())
+        userRepository.findByUsernameAndActiveTrue(registerDTO.getUsername())
                 .ifPresent(user -> {
                     throw new AlreadyExistsException("User already exists");
                 });
 
         // Verificar si el email ya exisste en la base de datos
-        userRepository.findByEmail(registerDTO.getEmail())
+        userRepository.findByEmailAndActiveTrue(registerDTO.getEmail())
                 .ifPresent(user -> {
                     throw new AlreadyExistsException("User already exists");
                 });
 
         // Verificar si el DUi ya existe en la base de datos
-        userRepository.findByDui(registerDTO.getDui())
+        userRepository.findByDuiAndActiveTrue(registerDTO.getDui())
                 .ifPresent(user -> {
                     throw new AlreadyExistsException("User already exists");
                 });

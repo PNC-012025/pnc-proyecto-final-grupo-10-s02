@@ -61,29 +61,15 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public List<BillResponseDTO> getAllMyBills() throws Exception {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-
-        UserData user = userRepository.findByUsernameAndActiveTrue(username)
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
-
-        return user.getBills()
-                .stream()
-                .filter(bill -> "PENDING".equals(bill.getState()))
-                .map(BillMapper::toDTO)
-                .toList();
-    }
-
-    @Override
     public PageResponse<BillResponseDTO> getMyBillsPaged(Pageable pageable) throws Exception {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        UserData user = userRepository.findByUsername(username)
+        UserData user = userRepository.findByUsernameAndActiveTrue(username)
                 .orElseThrow(() -> new ModelNotFoundException("User not found"));
 
         Specification<Bill> spec = Specification.allOf(
-                BillSpecifications.hasState("PENDING")
+                BillSpecifications.hasState("PENDING"),
+                BillSpecifications.hasUserId(user.getId())
         );
 
         Page<Bill> page = billRepository.findAll(spec, pageable);

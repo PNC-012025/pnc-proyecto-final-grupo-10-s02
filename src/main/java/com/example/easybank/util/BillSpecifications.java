@@ -13,6 +13,6 @@ public class BillSpecifications {
 
     public static Specification<Bill> hasUserId(UUID userId) {
         return (root, query, cb) ->
-                userId == null ? null : cb.equal(root.get("user_id"), userId);
+                userId == null ? null : cb.equal(root.get("user").get("id"), userId);
     }
 }

@@ -8,7 +8,6 @@ import com.example.easybank.service.AdminService;
 import com.example.easybank.util.GenericResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,8 +42,6 @@ public class AdminController {
                 .totalElements(page.getTotalElements())
                 .totalPages(page.getTotalPages())
                 .build().buildResponse();
-
-        return GenericResponse.success("Users found", users);
     }
 
     @GetMapping(USER_LIST + "/{id}")
@@ -133,16 +130,13 @@ public class AdminController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<GenericResponse> depositToUserAccount(
             @PathVariable UUID id,
-            @Valid @RequestBody DepositRequestDTO request,
-            Authentication authentication
+            @Valid @RequestBody DepositRequestDTO request
     ) {
-
         adminService.depositToUserAccount(
                 id,
                 request.getAccountId(),
                 request.getAmount(),
-                request.getDescription(),
-                authentication.getName()
+                request.getDescription()
         );
 
         return GenericResponse.success("Deposit completed successfully");
@@ -166,16 +160,16 @@ public class AdminController {
                 .build().buildResponse();
     }
 
-    @GetMapping(TRANSACTION)
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<GenericResponse> getTransactions(
-            @RequestParam(required = false) String id
-    ) {
-
-        return GenericResponse.success(
-                "Transactions retrieved",
-                adminService.getUserTransactions(id)
-        );
-    }
-
+//    @GetMapping(TRANSACTION)
+//    @PreAuthorize("hasRole('ADMIN')")
+//    public ResponseEntity<GenericResponse> getTransactions(
+//            @RequestParam(required = false) UUID id,
+//            Pageable pageable
+//    ) {
+//
+//        return GenericResponse.success(
+//                "Transactions retrieved",
+//                adminService.getUserTransactions(id, pageable)
+//        );
+//    }
 }

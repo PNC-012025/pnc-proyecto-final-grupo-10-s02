@@ -2,6 +2,7 @@ package com.example.easybank.service;
 
 
 import com.example.easybank.domain.dto.response.*;
+import com.example.easybank.util.RoleName;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -13,7 +14,8 @@ public interface AdminService {
 
     PageResponse<UserResponseDTO> findAllUsers(Pageable pageable);
     void delete(UUID id) throws Exception;
-    void changeRoles(UUID id, List<String> roles);
+    void changeRoles(UUID id, List<RoleName> roles);
+
     UserResponseDTO getUserById(UUID id);
     List<AccountResponseAdminDTO> getUserAccounts(UUID id);
     PageResponse<BillResponseDTO> getUserBills(UUID id, Pageable pageable);

@@ -85,8 +85,6 @@ public class TransactionServiceImpl implements TransactionService {
         accountRepository.save(destinationAccount);
 
         transactionRepository.save(transaction);
-
-
     }
 
     @Override
@@ -97,7 +95,7 @@ public class TransactionServiceImpl implements TransactionService {
         Pageable pageable
     ) throws Exception{
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        UserData user = userRepository.findByUsername(username)
+        UserData user = userRepository.findByUsernameAndActiveTrue(username)
                 .orElseThrow(() -> new ModelNotFoundException("User not found"));
         String accountNumber = user.getAccounts().getFirst().getNumber();
 

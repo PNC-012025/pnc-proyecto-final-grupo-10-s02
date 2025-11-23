@@ -3,20 +3,16 @@ package com.example.easybank.service.implementation;
 
 import com.example.easybank.domain.dto.response.*;
 import com.example.easybank.domain.mapper.*;
-import com.example.easybank.exception.ModelNotFoundException;
+import com.example.easybank.exception.*;
 import com.example.easybank.repository.*;
 import com.example.easybank.service.AdminService;
 import com.example.easybank.domain.entity.*;
-import com.example.easybank.util.BillSpecifications;
+import com.example.easybank.util.RoleName;
 import com.example.easybank.util.TransactionSpecifications;
 import jakarta.persistence.EntityNotFoundException;
-import com.example.easybank.exception.StorageException;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -46,13 +42,11 @@ public class AdminServiceImpl implements AdminService {
                 .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
     }
 
-
     //Obtiene un rol por nombre.
     private Role getRole(String name) {
         return roleRepository.findByName(name)
                 .orElseThrow(() -> new RoleNotFoundException("Role not found: " + name));
     }
-
 
     //Obtiene una cuenta por ID.
     private Account getAccountById(UUID id) {
@@ -61,8 +55,6 @@ public class AdminServiceImpl implements AdminService {
     }
 
     //-------------------------------------------
-
-
 
     //Devuelve todos los usuarios activos
     @Override
@@ -75,7 +67,6 @@ public class AdminServiceImpl implements AdminService {
 
 
     //Soft delete de un usuario (marca como inactivo).
-
     @Override
     public void delete(UUID id) {
         UserData user = getUserEntityById(id);
@@ -85,7 +76,6 @@ public class AdminServiceImpl implements AdminService {
 
 
     //Cambia los roles de un usuario.
-
     @Override
     public void changeRoles(UUID id, List<RoleName> roles) {
         UserData user = getUserEntityById(id);
@@ -126,7 +116,6 @@ public class AdminServiceImpl implements AdminService {
 
 
     //Obtiene bills de un usuario activo.
-
     @Override
     @Transactional//(readOnly = true)
     public PageResponse<BillResponseDTO> getUserBills(UUID userId, Pageable pageable) {
@@ -163,21 +152,22 @@ public class AdminServiceImpl implements AdminService {
     }
 
 
-     //Depósito a cuenta de usuario.
-     //Valida usuario activo, cuenta válida y monto positivo.
-
+    //Depósito a cuenta de usuario.
+    //Valida usuario activo, cuenta válida y monto positivo.
     @Override
     @Transactional
-    public void depositToUserAccount(UUID userId,
-                                     UUID accountId,
-                                     BigDecimal amount,
-                                     String description,
-                                     String performedByUsername) {
+    public void depositToUserAccount(
+            UUID userId,
+            UUID accountId,
+            BigDecimal amount,
+            String description
+    ) {
 
         // Obtener admin que realiza la acción
-        UserData admin = userRepository.findByUsernameAndActiveTrue(performedByUsername)
+        String userAdmin = SecurityContextHolder.getContext().getAuthentication().getName();
+        UserData admin = userRepository.findByUsernameAndActiveTrue(userAdmin)
                 .orElseThrow(() -> new UserNotFoundException(
-                        "Admin user not found with name: " + performedByUsername));
+                        "Admin user not found with name: " + userAdmin));
 
         // Obtener usuario destino y cuenta
         UserData user = getUserEntityById(userId);
