@@ -44,15 +44,20 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     public void register(RegisterDTO registerDTO) throws Exception {
 
-        userRepository.findByUsernameAndActiveTrue(registerDTO.getUsername())
+        // Verificar si el nombre de usuario ya esta tomado
+        userRepository.findByUsername(registerDTO.getUsername())
                 .ifPresent(user -> {
                     throw new AlreadyExistsException("User already exists");
                 });
-        userRepository.findByEmailAndActiveTrue(registerDTO.getEmail())
+
+        // Verificar si el email ya exisste en la base de datos
+        userRepository.findByEmail(registerDTO.getEmail())
                 .ifPresent(user -> {
                     throw new AlreadyExistsException("User already exists");
                 });
-        userRepository.findByDuiAndActiveTrue(registerDTO.getDui())
+
+        // Verificar si el DUi ya existe en la base de datos
+        userRepository.findByDui(registerDTO.getDui())
                 .ifPresent(user -> {
                     throw new AlreadyExistsException("User already exists");
                 });
@@ -80,13 +85,6 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public TokenResponse login(LoginDTO loginDTO) throws Exception {
-
-        String rawPassword = "admin123";
-        String hashed = "$2a$10$uU2LbWpxEbTfw06jgrUZGOGJDNZ5Y09PPN8WWpJhkfvP9uyx2guVa";
-
-        boolean match = new BCryptPasswordEncoder().matches(rawPassword, hashed);
-        System.out.println("¿Coincide? " + match); // debe imprimir true
-
         try{
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -95,19 +93,16 @@ public class AuthServiceImpl implements AuthService {
                     )
             );
             SecurityContextHolder.getContext().setAuthentication(authentication);
+
             String token = jwtTokenProvider.generateToken(authentication);
+
             return TokenResponse.builder()
                     .token(token)
                     .build();
 
-
-
         } catch (BadCredentialsException e){
             throw new InvalidCredentialsException("Invalid username or password");
         }
-
-
-
 
     }
 

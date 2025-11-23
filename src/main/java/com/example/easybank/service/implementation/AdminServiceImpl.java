@@ -3,15 +3,22 @@ package com.example.easybank.service.implementation;
 
 import com.example.easybank.domain.dto.response.*;
 import com.example.easybank.domain.mapper.*;
-import com.example.easybank.exception.*;
-import com.example.easybank.repository.AccountRepository;
-import com.example.easybank.repository.RoleRepository;
-import com.example.easybank.repository.TransactionRepository;
-import com.example.easybank.repository.UserRepository;
+import com.example.easybank.exception.ModelNotFoundException;
+import com.example.easybank.repository.*;
 import com.example.easybank.service.AdminService;
 import com.example.easybank.domain.entity.*;
-import com.example.easybank.util.RoleName;
+import com.example.easybank.util.BillSpecifications;
+import com.example.easybank.util.TransactionSpecifications;
+import jakarta.persistence.EntityNotFoundException;
+import com.example.easybank.exception.StorageException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +35,7 @@ public class AdminServiceImpl implements AdminService {
     private final RoleRepository roleRepository;
     private final TransactionRepository transactionRepository;
     private final AccountRepository accountRepository;
+    private final BillRepository billRepository;
 
 
     // Helper methods
@@ -58,9 +66,11 @@ public class AdminServiceImpl implements AdminService {
 
     //Devuelve todos los usuarios activos
     @Override
-    @Transactional(readOnly = true)
-    public List<UserResponseDTO> findAllUsers() {
-        return UserMapper.toDTOList(userRepository.findAllByActiveTrue());
+    public PageResponse<UserResponseDTO> findAllUsers(Pageable pageable) {
+
+        Page<UserResponseDTO> users = userRepository.findAll(pageable).map(UserMapper::toDTO);
+
+        return PageMapper.map(users);
     }
 
 
@@ -118,51 +128,38 @@ public class AdminServiceImpl implements AdminService {
     //Obtiene bills de un usuario activo.
 
     @Override
-    @Transactional(readOnly = true)
-    public List<BillResponseDTO> getUserBills(UUID userId) {
-        UserData user = getUserEntityById(userId);
+    @Transactional//(readOnly = true)
+    public PageResponse<BillResponseDTO> getUserBills(UUID userId, Pageable pageable) {
+        UserData user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
-        return user.getBills().stream()
-                .map(BillMapper::toDTO)
-                .toList();
+        Page<BillResponseDTO> bills = billRepository.getBillsByUser(user, pageable).map(BillMapper::toDTO);
+
+        return PageMapper.map(bills);
     }
 
-
-
-     //Obtiene transacciones de un usuario específico o todas si no se pasa ID.
-     //Valida UUID y existencia del usuario.
     @Override
-    @Transactional(readOnly = true)
-    public List<AdminTransactionResponseDTO> getUserTransactions(String id) {
+    @Transactional//(readOnly = true)
+    public PageResponse<AdminTransactionResponseDTO> getUserTransactions(UUID userId, Pageable pageable) {
 
-        // Si no se proporciona ID, devolver todas las transacciones
-        if (id == null || id.isBlank()) {
-            return transactionRepository.findAll()
-                    .stream()
-                    .map(AdminTransactionMapper::toDTO)
-                    .toList();
-        }
+        UserData user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
-        // Validación de UUID
-        UUID userId;
-        try {
-            userId = UUID.fromString(id);
-        } catch (IllegalArgumentException ex) {
-            throw new InvalidUUIDException("Invalid UUID format: " + id);
-        }
+        Specification<Transaction> spec = Specification.allOf(
+                TransactionSpecifications.hasAccount(user.getAccounts().getFirst().getNumber())
+        );
 
-        // Verifica que el usuario exista y esté activo
-        getUserEntityById(userId);
+        Page<AdminTransactionResponseDTO> transactions =
+            transactionRepository.findAll(spec, pageable).map(UserTransactionMapper::toDTO);
 
-        // Buscar transacciones donde el usuario sea origen o destino
-        List<Transaction> transactions =
-                transactionRepository
-                        .findByOriginAccount_User_IdOrDestinationAccount_User_IdOrderByDateTimeDesc(
-                                userId, userId);
+        return PageMapper.map(transactions);
+    }
 
-        return transactions.stream()
-                .map(AdminTransactionMapper::toDTO)
-                .toList();
+    @Override
+    public PageResponse<AdminTransactionResponseDTO> findAll(Pageable pageable) throws Exception{
+        Page<AdminTransactionResponseDTO> transactions = transactionRepository.findAll(pageable).map(UserTransactionMapper::toDTO);
+
+        return PageMapper.map(transactions);
     }
 
 

@@ -2,7 +2,9 @@ package com.example.easybank.service.implementation;
 
 import com.example.easybank.domain.dto.request.BillRequestDTO;
 import com.example.easybank.domain.dto.response.BillResponseDTO;
+import com.example.easybank.domain.dto.response.PageResponse;
 import com.example.easybank.domain.mapper.BillMapper;
+import com.example.easybank.domain.mapper.PageMapper;
 import com.example.easybank.exception.*;
 import com.example.easybank.service.BillService;
 import com.example.easybank.domain.entity.Account;
@@ -11,8 +13,12 @@ import com.example.easybank.domain.entity.UserData;
 import com.example.easybank.repository.AccountRepository;
 import com.example.easybank.repository.BillRepository;
 import com.example.easybank.repository.UserRepository;
+import com.example.easybank.util.BillSpecifications;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -70,7 +76,24 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
-    @Transactional
+    public PageResponse<BillResponseDTO> getMyBillsPaged(Pageable pageable) throws Exception {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        UserData user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ModelNotFoundException("User not found"));
+
+        Specification<Bill> spec = Specification.allOf(
+                BillSpecifications.hasState("PENDING")
+        );
+
+        Page<Bill> page = billRepository.findAll(spec, pageable);
+        
+        Page<BillResponseDTO> billPage = page.map(BillMapper::toDTO);
+
+        return PageMapper.map(billPage);
+    }
+
+    @Override
     public void delete(UUID id) throws Exception {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
@@ -114,6 +137,11 @@ public class BillServiceImpl implements BillService {
         billRepository.save(bill);
         accountRepository.save(account);
 
-
+        try{
+            accountRepository.save(account);
+        }
+        catch (DataAccessException e){
+            throw new StorageException("Failed to update account");
+        }
     }
 }

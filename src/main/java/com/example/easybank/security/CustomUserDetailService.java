@@ -24,8 +24,10 @@ public class CustomUserDetailService implements UserDetailsService {
         UserData user = userRepository.findByUsernameOrEmailAndActiveTrue(usernameOrEmail, usernameOrEmail)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found or inactive"));
 
-        Set<GrantedAuthority> grantedAuthorities = user.getRoles() .stream() .map(role ->
-                new SimpleGrantedAuthority("ROLE_" + role.getName())) .collect(Collectors.toSet());
+        Set<GrantedAuthority> grantedAuthorities = user.getRoles()
+                .stream()
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName()))
+                .collect(Collectors.toSet());
 
         return new User(user.getUsername(), user.getHashedPassword(), grantedAuthorities);
     }

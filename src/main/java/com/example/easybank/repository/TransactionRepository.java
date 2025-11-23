@@ -1,17 +1,18 @@
 package com.example.easybank.repository;
 
 import com.example.easybank.domain.entity.Transaction;
+import com.example.easybank.domain.entity.UserData;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface TransactionRepository extends JpaRepository<Transaction, UUID> {
-
-    List<Transaction> findByOriginAccount_User_IdOrDestinationAccount_User_IdOrderByDateTimeDesc(
-            UUID originUserId,
-            UUID destinationUserId
-    );
-
-
+    public Optional<Transaction> findTransactionsByOriginAccount(Account originAccount);
+    Page<Transaction> findByOriginAccount_User(UserData user, Pageable pageable);
+    Page<Transaction> findByDestinationAccount_User(UserData user, Pageable pageable);
+    Page<Transaction> findAll(Specification<Transaction> spec, Pageable pageable);
 }

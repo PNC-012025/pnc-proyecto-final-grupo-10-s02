@@ -2,16 +2,18 @@ package com.example.easybank.controller;
 
 import com.example.easybank.domain.dto.request.BillRequestDTO;
 import com.example.easybank.domain.dto.response.BillResponseDTO;
+import com.example.easybank.domain.dto.response.PageResponse;
 import com.example.easybank.service.implementation.BillServiceImpl;
 import com.example.easybank.util.GenericResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 import static com.example.easybank.util.Constant.*;
@@ -34,15 +36,21 @@ public class BillController {
                 .buildResponse();
     }
 
-    @PreAuthorize("hasRole('USER')")
-    @GetMapping(FIND_OWN)
-    public ResponseEntity<GenericResponse> findOwnBill() throws Exception {
-        List<BillResponseDTO> bills = billService.getAllMyBills();
+    @GetMapping(FIND)
+    public ResponseEntity<GenericResponse> findOwnBill(Pageable pageable) throws Exception {
+        PageResponse<BillResponseDTO> response = billService.getMyBillsPaged(pageable);
+
         return GenericResponse
                 .builder()
                 .status(HttpStatus.OK)
                 .message("Bills found")
-                .data(bills)
+                .data(response.getContent())
+                .pageNumber(response.getPageNumber())
+                .pageSize(response.getPageSize())
+                .first(response.isFirst())
+                .last(response.isLast())
+                .totalElements(response.getTotalElements())
+                .totalPages(response.getTotalPages())
                 .build().buildResponse();
     }
 
