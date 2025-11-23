@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -26,29 +27,28 @@ public class AccountServiceImpl implements AccountService {
     private final UserRepository userRepository;
 
     @Override
+    @Transactional
     public void save(AccountCreateDTO accountCreate) throws Exception {
-        accountRepository.findByNumber(accountCreate.getNumber())
+        accountRepository.findByNumberAndUser_ActiveTrue(accountCreate.getNumber())
                 .ifPresent(account -> { throw new AlreadyExistsException("Account already exists"); });
 
         Account account = AccountMapper.toEntity(accountCreate);
 
-        try{
-            accountRepository.save(account);
-        }
-        catch(DataAccessException e){
-            throw new StorageException("Failed to store account in database");
-        }
+        accountRepository.save(account);
+
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<Account> getAccountByNumber(String accountNumber) throws Exception {
         return Optional.empty();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public AccountResponseDTO getMyOwnAccount() throws Exception {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        UserData user = userRepository.findByUsername(username)
+        UserData user = userRepository.findByUsernameAndActiveTrue(username)
                 .orElseThrow(() -> new ModelNotFoundException("User not found"));
 
         if (user.getCards().isEmpty()) {

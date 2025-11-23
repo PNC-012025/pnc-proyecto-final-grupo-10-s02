@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -35,16 +36,17 @@ public class TransactionServiceImpl implements TransactionService {
     private final BillRepository billRepository;
 
     @Override
+    @Transactional
     public void createTransaction(TransactionRequestDTO transactionRequestDTO) throws Exception {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         System.out.println(transactionRequestDTO);
-        UserData user = userRepository.findByUsername(username)
+        UserData user = userRepository.findByUsernameAndActiveTrue(username)
                 .orElseThrow(() -> new ModelNotFoundException("User not found"));
 
-        Account originAccount = accountRepository.findByNumber(user.getAccounts().getFirst().getNumber())
+        Account originAccount = accountRepository.findByNumberAndUser_ActiveTrue(user.getAccounts().getFirst().getNumber())
                 .orElseThrow(() -> new ModelNotFoundException("Origin account not found"));
 
-        Account destinationAccount = accountRepository.findByNumber(transactionRequestDTO.getAccountNumber())
+        Account destinationAccount = accountRepository.findByNumberAndUser_ActiveTrue(transactionRequestDTO.getAccountNumber())
                 .orElseThrow(() -> new ModelNotFoundException("Destination account not found"));
 
         if (originAccount.getNumber().equals(destinationAccount.getNumber())) {
@@ -75,34 +77,21 @@ public class TransactionServiceImpl implements TransactionService {
         transaction.setDateTime(LocalDateTime.now());
         transaction.setType("TRANSFER");
 
-        try{
-            accountRepository.save(originAccount);
-        }
-        catch (DataAccessException e){
-            throw new StorageException("Failed to update origin account");
-        }
+        accountRepository.save(originAccount);
 
-        try{
-            accountRepository.save(destinationAccount);
-        }
-        catch (DataAccessException e){
-            throw new StorageException("Failed to update destination account");
-        }
+        accountRepository.save(destinationAccount);
 
-        try{
-            transactionRepository.save(transaction);
-        }
-        catch (DataAccessException e){
-            throw new StorageException("Failed to save transaction");
-        }
+        transactionRepository.save(transaction);
+
 
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<TransactionResponseDTO> findMyOwnTransactions() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        UserData user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ModelNotFoundException("User not found"));
+        UserData user = userRepository.findByUsernameAndActiveTrue(username)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         Account account = user.getAccounts().getFirst();
 
