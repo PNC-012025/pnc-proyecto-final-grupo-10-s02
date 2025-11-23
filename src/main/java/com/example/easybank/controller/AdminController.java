@@ -6,8 +6,8 @@ import com.example.easybank.domain.dto.request.DepositRequestDTO;
 import com.example.easybank.domain.dto.response.*;
 import com.example.easybank.service.AdminService;
 import com.example.easybank.util.GenericResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -18,101 +18,100 @@ import java.util.UUID;
 
 import static com.example.easybank.util.Constant.*;
 
-@RequestMapping(API+ADMIN)
+@RequestMapping(API + ADMIN)
 @RequiredArgsConstructor
 @RestController
 public class AdminController {
-    private final AdminService adminService;
 
+    private final AdminService adminService;
 
     @GetMapping(USER_LIST)
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<GenericResponse> getAllUsers() throws Exception {
+    public ResponseEntity<GenericResponse> getAllUsers() {
+
         List<UserResponseDTO> users = adminService.findAllUsers();
 
-        return GenericResponse.builder()
-                .data(users)
-                .message("Users found")
-                .status(HttpStatus.OK)
-                .build().buildResponse();
-
+        return GenericResponse.success("Users found", users);
     }
 
-    @GetMapping(USER_LIST + "/{id}")
+
+    @GetMapping(USER_LIST + ID)
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<GenericResponse> getUserById(@PathVariable("id")  UUID id) throws Exception {
+    public ResponseEntity<GenericResponse> getUserById(@PathVariable UUID id) {
+
         UserResponseDTO user = adminService.getUserById(id);
 
-        return GenericResponse.builder()
-                .data(user)
-                .message("User found")
-                .status(HttpStatus.OK)
-                .build().buildResponse();
+        return GenericResponse.success("User found", user);
     }
 
+
+
+    @DeleteMapping(USER_LIST + DELETE + ID)
     @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping(USER_LIST + DELETE + "/{id}")
-    public ResponseEntity<GenericResponse> deleteUser(@PathVariable("id") UUID id) throws Exception {
+    public ResponseEntity<GenericResponse> deleteUser(@PathVariable UUID id) {
+
         adminService.delete(id);
-        return GenericResponse.builder()
-                .status(HttpStatus.ACCEPTED)
-                .message("Successfully deleted user")
-                .build().buildResponse();
+
+        return GenericResponse.accepted("Successfully deleted user");
+
     }
 
+
+    @PutMapping(USER_LIST + CHANGE_ROLE + ID)
     @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping(USER_LIST + CHANGE_ROLE + "/{id}")
-    public ResponseEntity<GenericResponse> changeUserRoles(@PathVariable ("id") UUID id, @RequestBody ChangeRoleRequestDTO request) {
+    public ResponseEntity<GenericResponse> changeUserRoles(
+            @PathVariable UUID id,
+            @Valid @RequestBody ChangeRoleRequestDTO request
+
+    ) {
 
         adminService.changeRoles(id, request.getRoles());
 
-        return GenericResponse.builder()
-                .status(HttpStatus.OK)
-                .message("Roles updated successfully")
-                .build().buildResponse();
-    }
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping(USER_LIST + "/{id}/accounts")
-    public ResponseEntity<GenericResponse> getUserAccounts(@PathVariable ("id") UUID id) {
-        List<AccountResponseAdminDTO> accounts = adminService.getUserAccounts(id);
-        return GenericResponse.builder()
-                .data(accounts)
-                .message("User's accounts found")
-                .status(HttpStatus.OK)
-                .build().buildResponse();
-    }
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping(USER_LIST + "/{id}/bills")
-    public ResponseEntity<GenericResponse> getUserBills(@PathVariable ("id") UUID id) throws Exception {
-        List<BillResponseDTO> bills = adminService.getUserBills(id);
-        return GenericResponse.builder()
-                .data(bills)
-                .message("User's bills found")
-                .status(HttpStatus.OK)
-                .build().buildResponse();
+        return GenericResponse.success("Roles updated successfully");
     }
 
 
+    @GetMapping(USER_LIST + ID + ACCOUNT)
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping(USER_LIST + "/{id}/deposit")
+    public ResponseEntity<GenericResponse> getUserAccounts(@PathVariable UUID id) {
+
+        return GenericResponse.success(
+                "User's accounts found",
+                adminService.getUserAccounts(id)
+        );
+    }
+
+
+    @GetMapping(USER_LIST + ID + BILL)
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<GenericResponse> getUserBills(@PathVariable UUID id) {
+
+        return GenericResponse.success(
+                "User's bills found",
+                adminService.getUserBills(id)
+        );
+    }
+
+
+    @PostMapping(USER_LIST + ID + DEPOSIT)
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<GenericResponse> depositToUserAccount(
             @PathVariable UUID id,
-            @RequestBody DepositRequestDTO request,
-            Authentication authentication) {
+            @Valid @RequestBody DepositRequestDTO request,
+            Authentication authentication
+    ) {
 
-        adminService.depositToUserAccount(id,
+        adminService.depositToUserAccount(
+                id,
                 request.getAccountId(),
                 request.getAmount(),
                 request.getDescription(),
-                authentication.getName());
+                authentication.getName()
+        );
 
-        return GenericResponse.builder()
-                .status(HttpStatus.OK)
-                .message("Deposit completed successfully")
-                .build().buildResponse();
+        return GenericResponse.success("Deposit completed successfully");
     }
+
 
 
     @GetMapping(TRANSACTION)
@@ -120,24 +119,11 @@ public class AdminController {
     public ResponseEntity<GenericResponse> getTransactions(
             @RequestParam(required = false) String id
     ) {
-        List<AdminTransactionResponseDTO> transactions = adminService.getUserTransactions(id);
 
-        return GenericResponse.builder()
-                .data(transactions)
-                .status(HttpStatus.OK)
-                .message("Transactions retrieved")
-                .build()
-                .buildResponse();
+        return GenericResponse.success(
+                "Transactions retrieved",
+                adminService.getUserTransactions(id)
+        );
     }
 
-
-
 }
-
-
-
-
-
-
-
-
