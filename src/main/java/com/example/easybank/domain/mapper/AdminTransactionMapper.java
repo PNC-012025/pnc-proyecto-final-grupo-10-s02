@@ -4,7 +4,7 @@ import com.example.easybank.domain.dto.response.AdminTransactionResponseDTO;
 import com.example.easybank.domain.dto.response.UserTransactionResponseDTO;
 import com.example.easybank.domain.entity.Transaction;
 
-public class UserTransactionMapper {
+public class AdminTransactionMapper {
     public static AdminTransactionResponseDTO toDTO(Transaction transaction) {
         return AdminTransactionResponseDTO.builder()
                 .transactionId(transaction.getId())

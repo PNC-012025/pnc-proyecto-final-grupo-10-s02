@@ -3,6 +3,7 @@ package com.example.easybank.exception;
 import com.example.easybank.util.GenericResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -195,6 +196,113 @@ public class GlobalExceptionHandler {
     }
 
 
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<GenericResponse> handleUserNotFound(
+            UserNotFoundException ex,
+            WebRequest request
+    ) {
+        CustomErrorResponse error = new CustomErrorResponse(
+                LocalDate.now(),
+                ex.getMessage(),
+                request.getDescription(false)
+        );
+
+        return GenericResponse.builder()
+                .data(error)
+                .status(HttpStatus.NOT_FOUND)
+                .build()
+                .buildResponse();
+    }
+
+    @ExceptionHandler(AccountNotFoundException.class)
+    public ResponseEntity<GenericResponse> handleAccountNotFound(
+            AccountNotFoundException ex,
+            WebRequest request
+    ) {
+        CustomErrorResponse error = new CustomErrorResponse(
+                LocalDate.now(),
+                ex.getMessage(),
+                request.getDescription(false)
+        );
+
+        return GenericResponse.builder()
+                .data(error)
+                .status(HttpStatus.NOT_FOUND)
+                .build()
+                .buildResponse();
+    }
+
+    @ExceptionHandler(RoleNotFoundException.class)
+    public ResponseEntity<GenericResponse> handleRoleNotFound(
+            RoleNotFoundException ex,
+            WebRequest request
+    ) {
+        CustomErrorResponse error = new CustomErrorResponse(
+                LocalDate.now(),
+                ex.getMessage(),
+                request.getDescription(false)
+        );
+
+        return GenericResponse.builder()
+                .data(error)
+                .status(HttpStatus.NOT_FOUND)
+                .build()
+                .buildResponse();
+    }
+
+    @ExceptionHandler(TransactionNotFoundException.class)
+    public ResponseEntity<GenericResponse> handleTransactionNotFound(
+            TransactionNotFoundException ex,
+            WebRequest request
+    ) {
+        CustomErrorResponse error = new CustomErrorResponse(
+                LocalDate.now(),
+                ex.getMessage(),
+                request.getDescription(false)
+        );
+
+        return GenericResponse.builder()
+                .data(error)
+                .status(HttpStatus.NOT_FOUND)
+                .build()
+                .buildResponse();
+    }
+
+    @ExceptionHandler(BillNotFoundException.class)
+    public ResponseEntity<GenericResponse> handleBillNotFound(
+            BillNotFoundException ex,
+            WebRequest request
+    ) {
+        CustomErrorResponse error = new CustomErrorResponse(
+                LocalDate.now(),
+                ex.getMessage(),
+                request.getDescription(false)
+        );
+
+        return GenericResponse.builder()
+                .data(error)
+                .status(HttpStatus.NOT_FOUND)
+                .build()
+                .buildResponse();
+    }
+
+    @ExceptionHandler(InvalidUUIDException.class)
+    public ResponseEntity<GenericResponse> handleInvalidUUID(
+            InvalidUUIDException ex,
+            WebRequest request
+    ) {
+        CustomErrorResponse error = new CustomErrorResponse(
+                LocalDate.now(),
+                ex.getMessage(),
+                request.getDescription(false)
+        );
+
+        return GenericResponse.builder()
+                .data(error)
+                .status(HttpStatus.BAD_REQUEST)
+                .build()
+                .buildResponse();
+    }
 
 
 
@@ -208,6 +316,19 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.BAD_REQUEST)
                 .message("Validation failed")
                 .build().buildResponse();
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<GenericResponse> handleJsonParseError(HttpMessageNotReadableException ex) {
+
+        String message = "Invalid request format: " + ex.getMostSpecificCause().getMessage();
+
+        GenericResponse response = GenericResponse.builder()
+                .message(message)
+                .status(HttpStatus.BAD_REQUEST)
+                .build();
+
+        return response.buildResponse();
     }
 
 }

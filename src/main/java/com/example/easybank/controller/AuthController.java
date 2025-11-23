@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import static com.example.easybank.util.Constant.*;
@@ -39,6 +40,7 @@ public class AuthController {
                 .build().buildResponse();
     }
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping(WHO_AM_I)
     public ResponseEntity<GenericResponse> whoAmI() throws Exception {
         UserResponseDTO userData = authService.whoami();

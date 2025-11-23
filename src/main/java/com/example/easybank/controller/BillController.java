@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +22,7 @@ import static com.example.easybank.util.Constant.*;
 public class BillController {
     private final BillServiceImpl billService;
 
+    @PreAuthorize("hasRole('USER')")
     @PostMapping(CREATE)
     public ResponseEntity<GenericResponse> createBill(@RequestBody @Valid BillRequestDTO bill) throws Exception {
         billService.save(bill);
@@ -32,6 +34,7 @@ public class BillController {
                 .buildResponse();
     }
 
+    @PreAuthorize("hasRole('USER')")
     @GetMapping(FIND_OWN)
     public ResponseEntity<GenericResponse> findOwnBill() throws Exception {
         List<BillResponseDTO> bills = billService.getAllMyBills();
@@ -43,6 +46,7 @@ public class BillController {
                 .build().buildResponse();
     }
 
+    @PreAuthorize("hasRole('USER')")
     @PatchMapping(PAY + "/{id}")
     public ResponseEntity<GenericResponse> payBill(@PathVariable("id") UUID id) throws Exception {
         billService.payBill(id);
@@ -52,6 +56,7 @@ public class BillController {
                 .build().buildResponse();
     }
 
+    @PreAuthorize("hasRole('USER')")
     @PatchMapping(EDIT)
     public ResponseEntity<GenericResponse> editBill(@RequestBody @Valid BillRequestDTO bill) throws Exception {
         billService.save(bill);
@@ -61,6 +66,7 @@ public class BillController {
                 .build().buildResponse();
     }
 
+    @PreAuthorize("hasRole('USER')")
     @DeleteMapping(DELETE + "/{id}")
     public ResponseEntity<GenericResponse> deleteBill(@PathVariable("id") UUID id) throws Exception {
         billService.delete(id);
