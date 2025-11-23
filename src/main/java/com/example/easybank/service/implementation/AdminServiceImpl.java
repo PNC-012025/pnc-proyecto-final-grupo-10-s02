@@ -31,7 +31,7 @@ public class AdminServiceImpl implements AdminService {
 
 
     private UserData getUserEntityById(UUID id) {
-        return userRepository.findById(id)
+        return userRepository.findByIdAndActiveTrue(id)
                 .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
     }
 
@@ -49,15 +49,20 @@ public class AdminServiceImpl implements AdminService {
     @Override
     @Transactional(readOnly = true)
     public List<UserResponseDTO> findAllUsers() {
-        return UserMapper.toDTOList(userRepository.findAll());
+        return UserMapper.toDTOList(userRepository
+                .findAllByActiveTrue());
     }
+
 
 
     @Override
     public void delete(UUID id) {
         UserData user = getUserEntityById(id);
-        userRepository.delete(user);
+        // Soft delete
+        user.setActive(false);
+        userRepository.save(user);
     }
+
 
 
     @Override
@@ -152,7 +157,7 @@ public class AdminServiceImpl implements AdminService {
                                      String performedByUsername) {
 
         // Get admin realizando la accion
-        UserData admin = userRepository.findByUsername(performedByUsername)
+        UserData admin = userRepository.findByUsernameAndActiveTrue(performedByUsername)
                 .orElseThrow(() -> new UserNotFoundException(
                         "Admin user not found with name: " + performedByUsername));
 
