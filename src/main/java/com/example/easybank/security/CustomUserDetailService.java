@@ -21,8 +21,8 @@ public class CustomUserDetailService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String usernameOrEmail) throws UsernameNotFoundException {
-        UserData user = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
-                .orElseThrow(() -> new UsernameNotFoundException(usernameOrEmail));
+        UserData user = userRepository.findByUsernameOrEmailAndActiveTrue(usernameOrEmail, usernameOrEmail)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found or inactive"));
 
         Set<GrantedAuthority> grantedAuthorities = user.getRoles()
                 .stream()
@@ -31,4 +31,5 @@ public class CustomUserDetailService implements UserDetailsService {
 
         return new User(user.getUsername(), user.getHashedPassword(), grantedAuthorities);
     }
+
 }

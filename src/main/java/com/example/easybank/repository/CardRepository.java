@@ -9,5 +9,5 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface CardRepository extends JpaRepository<Card, UUID> {
-    public Optional<Card> findCardByUser(UserData userData);
+    Optional<Card> findCardByUser(UserData userData);
 }

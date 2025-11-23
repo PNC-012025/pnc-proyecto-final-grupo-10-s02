@@ -6,6 +6,7 @@ import com.example.easybank.domain.dto.request.DepositRequestDTO;
 import com.example.easybank.domain.dto.response.*;
 import com.example.easybank.service.AdminService;
 import com.example.easybank.util.GenericResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,10 +20,11 @@ import java.util.UUID;
 
 import static com.example.easybank.util.Constant.*;
 
-@RequestMapping(API+ADMIN)
+@RequestMapping(API + ADMIN)
 @RequiredArgsConstructor
 @RestController
 public class AdminController {
+
     private final AdminService adminService;
 
     @GetMapping(USER_LIST)
@@ -42,6 +44,7 @@ public class AdminController {
                 .totalPages(page.getTotalPages())
                 .build().buildResponse();
 
+        return GenericResponse.success("Users found", users);
     }
 
     @GetMapping(USER_LIST + "/{id}")
@@ -49,11 +52,7 @@ public class AdminController {
     public ResponseEntity<GenericResponse> getUserById(@PathVariable("id")  UUID id) throws Exception {
         UserResponseDTO user = adminService.getUserById(id);
 
-        return GenericResponse.builder()
-                .data(user)
-                .message("User found")
-                .status(HttpStatus.OK)
-                .build().buildResponse();
+        return GenericResponse.success("User found", user);
     }
 
 
@@ -61,10 +60,9 @@ public class AdminController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<GenericResponse> deleteUser(@PathVariable("id") UUID id) throws Exception {
         adminService.delete(id);
-        return GenericResponse.builder()
-                .status(HttpStatus.ACCEPTED)
-                .message("Successfully deleted user")
-                .build().buildResponse();
+
+        return GenericResponse.accepted("Successfully deleted user");
+
     }
 
 
@@ -74,10 +72,7 @@ public class AdminController {
 
         adminService.changeRoles(id, request.getRoles());
 
-        return GenericResponse.builder()
-                .status(HttpStatus.OK)
-                .message("Roles updated successfully")
-                .build().buildResponse();
+        return GenericResponse.success("Roles updated successfully");
     }
 
     @GetMapping(USER_LIST + "/{id}/accounts")
@@ -138,14 +133,19 @@ public class AdminController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<GenericResponse> depositToUserAccount(
             @PathVariable UUID id,
-            @RequestBody DepositRequestDTO request) {
+            @Valid @RequestBody DepositRequestDTO request,
+            Authentication authentication
+    ) {
 
-        adminService.depositToUserAccount(id, request.getAccountId(), request.getAmount(), request.getDescription());
+        adminService.depositToUserAccount(
+                id,
+                request.getAccountId(),
+                request.getAmount(),
+                request.getDescription(),
+                authentication.getName()
+        );
 
-        return GenericResponse.builder()
-                .status(HttpStatus.OK)
-                .message("Deposit completed successfully")
-                .build().buildResponse();
+        return GenericResponse.success("Deposit completed successfully");
     }
 
     @GetMapping(TRANSACTION)
@@ -165,12 +165,17 @@ public class AdminController {
                 .totalPages(page.getTotalPages())
                 .build().buildResponse();
     }
+
+    @GetMapping(TRANSACTION)
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<GenericResponse> getTransactions(
+            @RequestParam(required = false) String id
+    ) {
+
+        return GenericResponse.success(
+                "Transactions retrieved",
+                adminService.getUserTransactions(id)
+        );
+    }
+
 }
-
-
-
-
-
-
-
-

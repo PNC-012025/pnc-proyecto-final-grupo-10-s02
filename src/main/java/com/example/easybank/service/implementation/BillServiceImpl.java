@@ -21,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -34,10 +35,11 @@ public class BillServiceImpl implements BillService {
     private final AccountRepository accountRepository;
 
     @Override
+    @Transactional
     public void save(BillRequestDTO billRequestDTO) throws Exception {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        UserData user = userRepository.findByUsername(username)
+        UserData user = userRepository.findByUsernameAndActiveTrue(username)
                 .orElseThrow(() -> new ModelNotFoundException("User not found"));
 
         if (billRequestDTO.getId() != null) {
@@ -54,20 +56,17 @@ public class BillServiceImpl implements BillService {
         bill.setUser(user);
         bill.setState("PENDING");
 
-        try{
-            billRepository.save(bill);
-        }
-        catch (DataAccessException e){
-            throw new StorageException("Failed to save bill");
-        }
+        billRepository.save(bill);
+
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<BillResponseDTO> getAllMyBills() throws Exception {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        UserData user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ModelNotFoundException("User not found"));
+        UserData user = userRepository.findByUsernameAndActiveTrue(username)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         return user.getBills()
                 .stream()
@@ -109,10 +108,11 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
+    @Transactional
     public void payBill(UUID id) throws Exception {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         Bill bill = billRepository.findById(id)
-                .orElseThrow(() -> new ModelNotFoundException("Bill not found"));
+                .orElseThrow(() -> new BillNotFoundException("Bill not found"));
 
         Account account = bill.getUser().getAccounts().getFirst();
 
@@ -134,12 +134,8 @@ public class BillServiceImpl implements BillService {
         bill.setState("PAID");
 
 
-        try{
-            billRepository.save(bill);
-        }
-        catch (DataAccessException e){
-            throw new StorageException("Failed to save bill");
-        }
+        billRepository.save(bill);
+        accountRepository.save(account);
 
         try{
             accountRepository.save(account);

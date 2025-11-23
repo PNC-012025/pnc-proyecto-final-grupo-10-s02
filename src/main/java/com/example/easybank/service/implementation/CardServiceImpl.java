@@ -1,5 +1,6 @@
 package com.example.easybank.service.implementation;
 
+import com.example.easybank.exception.UserNotFoundException;
 import com.example.easybank.service.CardService;
 import com.example.easybank.domain.CreditCardData;
 import com.example.easybank.domain.entity.Card;
@@ -12,6 +13,7 @@ import com.example.easybank.util.generator.RandomCreditCardGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -21,10 +23,11 @@ public class CardServiceImpl implements CardService {
     private final RandomCreditCardGenerator randomCreditCardGenerator;
 
     @Override
+    @Transactional
     public Card create() throws Exception {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        UserData user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ModelNotFoundException("User not found"));
+        UserData user = userRepository.findByUsernameAndActiveTrue(username)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         if(!user.getCards().isEmpty()) {
             throw new AlreadyExistsException("Card already exists");
@@ -46,7 +49,7 @@ public class CardServiceImpl implements CardService {
     @Override
     public Card findMyOwnCard() throws Exception {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        UserData user = userRepository.findByUsername(username)
+        UserData user = userRepository.findByUsernameAndActiveTrue(username)
                 .orElseThrow(() -> new ModelNotFoundException("User not found"));
 
         Card card = user.getCards().getFirst();

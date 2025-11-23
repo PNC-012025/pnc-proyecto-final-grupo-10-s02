@@ -26,9 +26,12 @@ public class Constant {
     public static final String FIND_BY_ID = "/findbyid";
     public static final String DELETE = "/delete";
     public static final String EDIT = "/edit";
+    public static final String DEPOSIT = "/deposit";
 
     public static final String ADMIN = "/admin";
     public static final String USER_LIST = "/userlist";
     public static final String CHANGE_ROLE = "/changerole";
+    public static final String ID = "/{id}";
+
 
 }
