@@ -2,7 +2,7 @@
 
 Este repositorio contiene la API REST para **EasyBank**, una plataforma de banca en línea desarrollada con **Spring Boot**, **PostgreSQL** y **Docker**, y desplegada en producción mediante **Railway**.
 
-Provee autenticación segura con JWT, control de usuarios y administración de transacciones financieras para la aplicación frontend [EasyBank Frontend](https://github.com/amgems/easybank-frontend).
+Provee autenticación segura con JWT, control de usuarios y administración de transacciones financieras para la aplicación frontend [EasyBank Frontend](https://github.com/AxelAlvardo/IS---EasyBank---Frontend).
 
 ---
 
