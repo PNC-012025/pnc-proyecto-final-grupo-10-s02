@@ -80,7 +80,7 @@ Provee autenticación segura con JWT, control de usuarios y administración de t
 La API implementa autenticación mediante **JWT**.
 
 - Registro y login de usuarios.
-- Protección de rutas según roles (ADMIN, CLIENTE).
+- Protección de rutas según roles (ADMIN, USER).
 - Middleware para validar tokens en cada petición.
 
 ---
