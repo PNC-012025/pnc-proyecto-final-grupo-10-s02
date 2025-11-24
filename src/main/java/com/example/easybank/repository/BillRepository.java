@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.UUID;
 
 public interface BillRepository extends JpaRepository<Bill, UUID> {
-    public List<Bill> getBillsById(UUID id);
-    public List<Bill> findBillsByStateAndUser(String state, UserData user);
-    public Page<Bill> getBillsByUser(UserData userData, Pageable pageable);
-    public Page<Bill> findAll(Specification<Bill> spec, Pageable pageable);
+    List<Bill> getBillsById(UUID id);
+    List<Bill> findBillsByStateAndUser(String state, UserData user);
+    Page<Bill> getBillsByUser(UserData userData, Pageable pageable);
+    Page<Bill> findAll(Specification<Bill> spec, Pageable pageable);
 }
