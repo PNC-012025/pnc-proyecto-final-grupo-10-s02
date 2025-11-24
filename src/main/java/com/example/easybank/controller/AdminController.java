@@ -160,16 +160,5 @@ public class AdminController {
                 .build().buildResponse();
     }
 
-//    @GetMapping(TRANSACTION)
-//    @PreAuthorize("hasRole('ADMIN')")
-//    public ResponseEntity<GenericResponse> getTransactions(
-//            @RequestParam(required = false) UUID id,
-//            Pageable pageable
-//    ) {
-//
-//        return GenericResponse.success(
-//                "Transactions retrieved",
-//                adminService.getUserTransactions(id, pageable)
-//        );
-//    }
+
 }
